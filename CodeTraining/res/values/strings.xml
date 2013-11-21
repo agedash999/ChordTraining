@@ -1,5 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
     <string name="app_name">CodeTraining</string>
+    <string name="title_activity_main">CodeTraining</string>
+    <string name="action_settings">Settings</string>
+    <string name="button_start">Start</string>
+    <string name="button_stop">Stop</string>
+    <string name="cbx_251">2/5/1進行</string>
 
 </resources>
