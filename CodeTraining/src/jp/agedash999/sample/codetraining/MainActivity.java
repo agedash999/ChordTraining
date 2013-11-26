@@ -2,6 +2,7 @@ package jp.agedash999.sample.codetraining;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.SurfaceView;
 import android.view.View;
@@ -12,14 +13,18 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
 public class MainActivity
-	extends Activity
-	implements OnClickListener, OnCheckedChangeListener {
+extends Activity
+implements OnClickListener, OnCheckedChangeListener {
 
-    private SurfaceView sv; //標準のSV？
-    private CodeView codeView;
+	private SurfaceView sv; //標準のSV？
+	private CodeView codeView;
+
+	//ログ関連
+	private final String logTag = "CodeTraining.MainActivity";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		Log.d(logTag, "onCreate");
 		//定番
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
@@ -36,7 +41,22 @@ public class MainActivity
 		((Button)findViewById(R.id.btn_start)).setOnClickListener(this);
 		((Button)findViewById(R.id.btn_stop)).setOnClickListener(this);
 		((CheckBox)findViewById(R.id.cbx_251)).setOnCheckedChangeListener(this);
-}
+
+		changeUIforWaiting();
+	}
+
+	@Override
+	protected void onPause() {
+		changeUIforWaiting();
+		codeView.stopPlaying();
+		super.onPause();
+	}
+
+	@Override
+	protected void onResume() {
+		// TODO 自動生成されたメソッド・スタブ
+		super.onResume();
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -50,21 +70,14 @@ public class MainActivity
 
 		switch (v.getId()) {
 		case R.id.btn_start:
-			//TODO 251無効化 ハンドリング方法問題ないか
-			//TODO ボタン切替 ハンドリング方法問題ないか
-			v.setEnabled(false);
-			findViewById(R.id.btn_stop).setEnabled(true);
-
-			codeView.startThread();
+			changeUIforPlaying();
+			codeView.startPlaying();
 			break;
 
 		case R.id.btn_stop:
-			//TODO 251有効化 ハンドリング方法問題ないか
-			//TODO ボタン切替 ハンドリング方法問題ないか
 			v.setEnabled(false);
-			findViewById(R.id.btn_start).setEnabled(true);
-
-			codeView.stopThread();
+			changeUIforWaiting();
+			codeView.stopPlaying();
 			break;
 
 		default:
@@ -77,12 +90,28 @@ public class MainActivity
 
 		switch (cb.getId()) {
 		case R.id.cbx_251:
-			//TODO チェックボックス変更時の処理
+			//TODO 後ほど）チェックボックス変更時の処理
+			codeView.clearCode(true);
 
 			break;
 
 		default:
 			break;
 		}
+	}
+
+	private void changeUIforPlaying(){
+		//TODO 251無効化 ハンドリング方法問題ないか
+		//TODO ボタン切替 ハンドリング方法問題ないか
+		((Button)findViewById(R.id.btn_start)).setEnabled(false);
+		((Button)findViewById(R.id.btn_stop)).setEnabled(true);
+	}
+
+	private void changeUIforWaiting(){
+		//TODO 251無効化 ハンドリング方法問題ないか
+		//TODO ボタン切替 ハンドリング方法問題ないか
+		((Button)findViewById(R.id.btn_start)).setEnabled(true);
+		((Button)findViewById(R.id.btn_stop)).setEnabled(false);
+
 	}
 }

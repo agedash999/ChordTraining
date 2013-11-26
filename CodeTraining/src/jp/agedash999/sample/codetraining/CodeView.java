@@ -1,20 +1,35 @@
 package jp.agedash999.sample.codetraining;
 
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Random;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
+import android.graphics.Rect;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 public class CodeView
-	implements SurfaceHolder.Callback, Runnable {
+implements SurfaceHolder.Callback, Runnable {
 
 	private SurfaceHolder holder;
 	private Thread thread;
 	private static Context context;
 	private Bitmap whiteRect;
+	private Bitmap lamp;
+	private Bitmap parenthesis;
+
+	//コード関連
+	//	private Code[] codes;
+	private List<Code> codelist = new ArrayList<Code>();
+	private final int codeNumber = 4;
+
+	public boolean twofiveFlag = false;
 
 	//ループ処理のステータス
 	private int status;
@@ -23,6 +38,25 @@ public class CodeView
 	private final int COUNT = 2;
 	private final int PLAYING = 3;
 	private final int PREPARE_STOP = 4;
+	private final int ERROR = 999;
+
+	//ログ関連
+	private final String logTag = "CodeTraining.CodeView";
+
+	private Random rnd = new Random();
+
+	//画面表示位置関連
+	private int canvasWidth;
+	private int canvasHeight;
+	private int[] size;
+	private int[] srcX;
+	private int[] srcY;
+	private int[] dstX;
+	private int[] dstY;
+	private int lampSrcX;
+	private int lampSrcY;
+	private int lampDstX;
+	private int lampDstY;
 
 
 	public CodeView(Context context, SurfaceView sv){
@@ -32,46 +66,232 @@ public class CodeView
 		holder = sv.getHolder();
 		holder.addCallback( this );
 
-		this.whiteRect = BitmapFactory.decodeResource
+		whiteRect = BitmapFactory.decodeResource
 				(CodeView.context.getResources(), R.drawable.white);
+		lamp =  BitmapFactory.decodeResource
+				(CodeView.context.getResources(), R.drawable.lamp);
+
+		//画面表示配列の初期化
+		size = new int[codeNumber];
+		srcX = new int[codeNumber];
+		srcY = new int[codeNumber];
+		dstX = new int[codeNumber];
+		dstY = new int[codeNumber];
 
 		//Threadの作成
 		this.thread = new Thread(this);
 	}
 
-	public void startThread(){
-		//スレッド開始処理
-		status = PREPARE_START;
-		this.thread.start();
-	}
-
-	public void stopThread(){
-		//TODO スレッド一時停止処理
-		status = PREPARE_STOP;
-	}
-
 	@Override
-	public void run() {
-		// TODO ループ処理
-
-	}
-
-	@Override
-	public void surfaceChanged
-	(SurfaceHolder arg0, int arg1, int arg2, int arg3) {
-	}
-
-	@Override
-	public void surfaceCreated(SurfaceHolder arg0) {
+	public void surfaceCreated(SurfaceHolder holder) {
 		// TODO 画面生成後の初期処理
-        Canvas canvas = arg0.lockCanvas();
-        canvas.drawColor(Color.GRAY);
-        arg0.unlockCanvasAndPost(canvas);
+		Canvas canvas = holder.lockCanvas();
+//		canvas.drawColor(Color.GRAY);
+		setScreenParm(canvas);
+		holder.unlockCanvasAndPost(canvas);
+		doDrow();
+	}
+
+	private void setScreenParm(Canvas canvas) {
+		canvasWidth = canvas.getWidth();
+		canvasHeight = canvas.getHeight();
+		int base = canvasWidth/100;
+		size[0] = base * 25;
+		size[1] = base * 15;
+		size[2] = base * 15;
+		size[3] = base * 15;
+
+		srcY[0] = base * 6;
+		dstY[0] = srcY[0] + size[0];
+
+		srcY[1] = dstY[0] + base * 6;
+		dstY[1] = srcY[1] + size[1];
+
+		srcY[2] = dstY[1] + base * 6;
+		dstY[2] = srcY[2] + size[2];
+
+		srcY[3] = dstY[2] + base * 6;
+		dstY[3] = srcY[3] + size[3];
+
+		lampSrcY = dstY[0] + base * 3;
+		lampDstY = lampSrcY + base * 5;
+
+		srcX[0] = ( canvasHeight - size[0] ) / 2 ;
+		dstX[0] = srcX[0] + size[0] ;
+
+		dstX[1] = dstX[0];
+		srcX[1] = dstX[1] - size[1] ;
+
+		dstX[2] = dstX[0];
+		srcX[2] = dstX[2] - size[2] ;
+
+		dstX[3] = dstX[0];
+		srcX[3] = dstX[3] - size[3] ;
+
+		lampSrcX = srcX[0];
+		lampDstX = lampSrcX + base * 5;
+
 	}
 
 	@Override
 	public void surfaceDestroyed(SurfaceHolder arg0) {
 		// TODO 画面破棄時の処理
+	}
+
+
+	public void startPlaying(){
+		//スレッド開始処理
+		status = PREPARE_START;
+		Log.d(logTag, "Status Chenged: PREPARE_START");
+		switch (thread.getState()) {
+		case WAITING:
+			synchronized (thread) {
+				thread.notify();
+			}
+			break;
+
+		case NEW:
+			thread.start();
+			break;
+
+		case RUNNABLE:
+			thread.start();
+			break;
+
+		default:
+			Log.e(logTag, "UnExpected block");
+			//TODO スレッドのハンドリングについて、要検討
+		}
+	}
+
+	public void stopPlaying(){
+		status = PREPARE_STOP;
+		Log.d(logTag, "Status Chenged: PREPARE_STOP");
+	}
+
+	public void clearCode(boolean refleshFlag){
+		codelist.clear();
+		if(refleshFlag){
+			doDrow();
+			Log.d(logTag, "clearCode");
+
+		}
+	}
+
+	private Code createOneCode(Code prev){
+		//コードを生成する
+		CodeRoot root = null;
+		CodeForm form = null;
+		CodeTension[] tensions = null;
+		if(prev == null || !twofiveFlag){
+			//TODO 後ほど 設定に従って生成するロジック
+			//Rootの生成
+			int n = rnd.nextInt(EnumSet.allOf(CodeRoot.class).size()-1);
+			root = CodeRoot.values()[n];
+			n = rnd.nextInt(EnumSet.allOf(CodeForm.class).size());
+			if(n!=0){
+				root = CodeRoot.values()[n-1];
+			}
+		}else{
+			//TODO 後ほど 25フラグに応じて生成するロジック
+			//TODO 後ほど 設定に従って生成するロジック
+		}
+		return new Code(root,form,tensions);
+	}
+
+	private void doDrow(){
+		//画面描画
+		Canvas canvas = holder.lockCanvas();
+		Rect srcRect = new Rect();
+		Rect dstRect = new Rect();
+
+		//コードの描画
+		for(int i = 0; i < codelist.size() ; i++){
+			srcRect.set(0,0,whiteRect.getWidth(),whiteRect.getHeight());
+			dstRect.set(srcY[i],srcX[i],dstY[i],dstX[i]);
+			canvas.drawBitmap(whiteRect, srcRect, dstRect, null);
+			Code code = codelist.get(i);
+			if(code!=null){
+				canvas.drawBitmap(code.root.Image(), srcRect, dstRect, null);
+				if(code.form!=null){
+					canvas.drawBitmap(code.form.Image(), srcRect, dstRect, null);
+				}
+				if(code.tensions!=null && code.tensions.length!=0){
+					canvas.drawBitmap(parenthesis, srcRect, dstRect, null);
+					for(CodeTension tension : code.tensions){
+						canvas.drawBitmap(tension.Image(), srcRect, dstRect, null);
+					}
+				}
+			}else{
+//				srcRect.set(0,0,whiteRect.getWidth(),whiteRect.getHeight());
+//				dstRect.set(srcY[i],srcX[i],dstY[i],dstX[i]);
+//				canvas.drawBitmap(whiteRect, srcRect, dstRect, null);
+			}
+		}
+		//TODO ランプの描画
+
+		holder.unlockCanvasAndPost(canvas);
+	}
+
+	@Override
+	public void run() {
+		// TODO ループ処理
+		while(true){
+			switch (this.status) {
+			case STOP:
+				break;
+			case PREPARE_START:
+				//コード初期生成
+				for(int i=0;i<codeNumber;i++){
+					if(i<=0){
+						codelist.add(i, createOneCode(null));
+					}else{
+						codelist.add(i, createOneCode(codelist.get(i-1)));
+					}
+				}
+				//コード表示
+				doDrow();
+				//カウント開始
+				status = COUNT;
+				break;
+
+			case COUNT:
+				//カウント表示処理
+
+				status = PLAYING;
+				break;
+
+			case PLAYING:
+				//カウント表示
+				//コード移動・追加生成
+				doDrow();
+
+				break;
+
+			case PREPARE_STOP:
+				synchronized (thread) {
+					try {
+						thread.wait();
+						status = STOP;
+					} catch (InterruptedException e) {
+						// TODO 自動生成された catch ブロック
+						status = ERROR;
+						Log.e(logTag, "InterruptedException");
+						e.printStackTrace();
+					}
+				}
+
+				break;
+
+			default:
+				break;
+			}
+		}
+	}
+
+	@Override
+	public void surfaceChanged
+	(SurfaceHolder arg0, int arg1, int arg2, int arg3) {
 	}
 
 	enum CodeRoot{
@@ -112,7 +332,33 @@ public class CodeView
 	}
 
 	enum CodeTension{
+		//TODO テンションは未実装。
+		;
+		public final Bitmap image;
+		public Bitmap Image(){return image;};
+
+		private CodeTension(int imageID){
+			this.image = BitmapFactory.decodeResource
+					(CodeView.context.getResources(), imageID);
+		}
 
 	}
 
+	class Code{
+		public CodeRoot root;
+		public CodeForm form;
+		public CodeTension[] tensions;
+
+		public Code(CodeRoot root,CodeForm form, CodeTension[] tensions){
+			this.root = root;
+			this.form = form;
+			int i = 0;
+			if(tensions!=null){
+				for(CodeTension tension : tensions){
+					tensions[i] = tension;
+					i++;
+				}
+			}
+		}
+	}
 }
