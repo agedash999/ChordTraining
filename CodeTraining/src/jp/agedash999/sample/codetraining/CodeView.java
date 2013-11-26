@@ -3,7 +3,6 @@ package jp.agedash999.sample.codetraining;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Random;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -43,7 +42,7 @@ implements SurfaceHolder.Callback, Runnable {
 	//ログ関連
 	private final String logTag = "CodeTraining.CodeView";
 
-	private Random rnd = new Random();
+	//	private Random rnd = new Random();
 
 	//画面表示位置関連
 	private int canvasWidth;
@@ -86,7 +85,7 @@ implements SurfaceHolder.Callback, Runnable {
 	public void surfaceCreated(SurfaceHolder holder) {
 		// TODO 画面生成後の初期処理
 		Canvas canvas = holder.lockCanvas();
-//		canvas.drawColor(Color.GRAY);
+		//		canvas.drawColor(Color.GRAY);
 		setScreenParm(canvas);
 		holder.unlockCanvasAndPost(canvas);
 		doDrow();
@@ -186,9 +185,10 @@ implements SurfaceHolder.Callback, Runnable {
 		if(prev == null || !twofiveFlag){
 			//TODO 後ほど 設定に従って生成するロジック
 			//Rootの生成
-			int n = rnd.nextInt(EnumSet.allOf(CodeRoot.class).size()-1);
+
+			int n = (int)(Math.random() * (EnumSet.allOf(CodeRoot.class).size()-1));
 			root = CodeRoot.values()[n];
-			n = rnd.nextInt(EnumSet.allOf(CodeForm.class).size());
+			n = (int)(Math.random() * (EnumSet.allOf(CodeForm.class).size()));
 			if(n!=0){
 				root = CodeRoot.values()[n-1];
 			}
@@ -206,12 +206,12 @@ implements SurfaceHolder.Callback, Runnable {
 		Rect dstRect = new Rect();
 
 		//コードの描画
-		for(int i = 0; i < codelist.size() ; i++){
+		for(int i = 0; i < codeNumber ; i++){
 			srcRect.set(0,0,whiteRect.getWidth(),whiteRect.getHeight());
 			dstRect.set(srcY[i],srcX[i],dstY[i],dstX[i]);
 			canvas.drawBitmap(whiteRect, srcRect, dstRect, null);
-			Code code = codelist.get(i);
-			if(code!=null){
+			if(i < codelist.size()){
+				Code code = codelist.get(i);
 				canvas.drawBitmap(code.root.Image(), srcRect, dstRect, null);
 				if(code.form!=null){
 					canvas.drawBitmap(code.form.Image(), srcRect, dstRect, null);
@@ -222,10 +222,6 @@ implements SurfaceHolder.Callback, Runnable {
 						canvas.drawBitmap(tension.Image(), srcRect, dstRect, null);
 					}
 				}
-			}else{
-//				srcRect.set(0,0,whiteRect.getWidth(),whiteRect.getHeight());
-//				dstRect.set(srcY[i],srcX[i],dstY[i],dstX[i]);
-//				canvas.drawBitmap(whiteRect, srcRect, dstRect, null);
 			}
 		}
 		//TODO ランプの描画
@@ -236,13 +232,13 @@ implements SurfaceHolder.Callback, Runnable {
 	@Override
 	public void run() {
 		// TODO ループ処理
-		while(true){
+		while(thread != null){
 			switch (this.status) {
 			case STOP:
 				break;
 			case PREPARE_START:
 				//コード初期生成
-				for(int i=0;i<codeNumber;i++){
+				for(int i = codelist.size();i<codeNumber;i++){
 					if(i<=0){
 						codelist.add(i, createOneCode(null));
 					}else{
@@ -271,8 +267,8 @@ implements SurfaceHolder.Callback, Runnable {
 			case PREPARE_STOP:
 				synchronized (thread) {
 					try {
-						thread.wait();
 						status = STOP;
+						thread.wait();
 					} catch (InterruptedException e) {
 						// TODO 自動生成された catch ブロック
 						status = ERROR;

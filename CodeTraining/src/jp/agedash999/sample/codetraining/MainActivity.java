@@ -101,17 +101,16 @@ implements OnClickListener, OnCheckedChangeListener {
 	}
 
 	private void changeUIforPlaying(){
-		//TODO 251無効化 ハンドリング方法問題ないか
 		//TODO ボタン切替 ハンドリング方法問題ないか
 		((Button)findViewById(R.id.btn_start)).setEnabled(false);
 		((Button)findViewById(R.id.btn_stop)).setEnabled(true);
+		((CheckBox)findViewById(R.id.cbx_251)).setEnabled(false);
 	}
 
 	private void changeUIforWaiting(){
-		//TODO 251無効化 ハンドリング方法問題ないか
 		//TODO ボタン切替 ハンドリング方法問題ないか
 		((Button)findViewById(R.id.btn_start)).setEnabled(true);
 		((Button)findViewById(R.id.btn_stop)).setEnabled(false);
-
+		((CheckBox)findViewById(R.id.cbx_251)).setEnabled(true);
 	}
 }
