@@ -8,6 +8,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -20,8 +22,18 @@ implements SurfaceHolder.Callback, Runnable {
 	private Thread thread;
 	private static Context context;
 	private Bitmap whiteRect;
-	private Bitmap lamp;
+	private Bitmap lampR;
+	private Bitmap lampB;
 	private Bitmap parenthesis;
+	private Paint paint = new Paint();
+	private long baseTime;
+	private int count;
+
+	//設定値
+	//　テンポ ＝　一分間(60000mills)に四分音符を何回打つか
+	//　600000 / テンポ ＝ １拍の長さ
+	private int tempo = 60000/96;
+	private int rhythm = 4;
 
 	//コード関連
 	//	private Code[] codes;
@@ -67,8 +79,10 @@ implements SurfaceHolder.Callback, Runnable {
 
 		whiteRect = BitmapFactory.decodeResource
 				(CodeView.context.getResources(), R.drawable.white);
-		lamp =  BitmapFactory.decodeResource
-				(CodeView.context.getResources(), R.drawable.lamp);
+		lampR =  BitmapFactory.decodeResource
+				(CodeView.context.getResources(), R.drawable.lamp_r);
+		lampB =  BitmapFactory.decodeResource
+				(CodeView.context.getResources(), R.drawable.lamp_b);
 
 		//画面表示配列の初期化
 		size = new int[codeNumber];
@@ -88,7 +102,7 @@ implements SurfaceHolder.Callback, Runnable {
 		//		canvas.drawColor(Color.GRAY);
 		setScreenParm(canvas);
 		holder.unlockCanvasAndPost(canvas);
-		doDrow();
+		doDraw();
 	}
 
 	private void setScreenParm(Canvas canvas) {
@@ -171,7 +185,7 @@ implements SurfaceHolder.Callback, Runnable {
 	public void clearCode(boolean refleshFlag){
 		codelist.clear();
 		if(refleshFlag){
-			doDrow();
+			doDraw();
 			Log.d(logTag, "clearCode");
 
 		}
@@ -198,12 +212,17 @@ implements SurfaceHolder.Callback, Runnable {
 		}
 		return new Code(root,form,tensions);
 	}
+	private void doDraw(){
+		doDraw(lampR,0);
+	}
 
-	private void doDrow(){
+	private void doDraw(Bitmap lamp,int alpha){
 		//画面描画
 		Canvas canvas = holder.lockCanvas();
 		Rect srcRect = new Rect();
 		Rect dstRect = new Rect();
+
+		canvas.drawColor(Color.GRAY);
 
 		//コードの描画
 		for(int i = 0; i < codeNumber ; i++){
@@ -225,6 +244,11 @@ implements SurfaceHolder.Callback, Runnable {
 			}
 		}
 		//TODO ランプの描画
+		srcRect.set(0,0,lamp.getWidth(),lamp.getHeight());
+		dstRect.set(lampSrcY,lampSrcX,lampDstY,lampDstX);
+		paint.setAlpha(alpha);
+		canvas.drawBitmap(lamp,srcRect,dstRect, paint);
+
 
 		holder.unlockCanvasAndPost(canvas);
 	}
@@ -233,10 +257,9 @@ implements SurfaceHolder.Callback, Runnable {
 	public void run() {
 		// TODO ループ処理
 		while(thread != null){
-			switch (this.status) {
-			case STOP:
-				break;
-			case PREPARE_START:
+			if(status==STOP){
+
+			}else if(status==PREPARE_START){
 				//コード初期生成
 				for(int i = codelist.size();i<codeNumber;i++){
 					if(i<=0){
@@ -246,28 +269,69 @@ implements SurfaceHolder.Callback, Runnable {
 					}
 				}
 				//コード表示
-				doDrow();
+				doDraw();
 				//カウント開始
 				status = COUNT;
-				break;
-
-			case COUNT:
+				baseTime = System.currentTimeMillis();
+				count = 1;
+			}else if(status==COUNT){
 				//カウント表示処理
-
-				status = PLAYING;
-				break;
-
-			case PLAYING:
+				long time = System.currentTimeMillis();
+				int alpha = 0;
+				Bitmap lamp = lampR;
+				if(time < baseTime + tempo){
+					//カウント更新なし
+					lamp = lampR;
+					alpha = (int)(255 * (1.0 - ((double)time - baseTime)/tempo));
+				}else if(count < rhythm){
+					//カウント更新
+					baseTime += tempo;
+					count++;
+					lamp = lampR;
+//					alpha = (int)(255 * (1.0 - ((double)time - baseTime)/tempo));
+					alpha = 255;
+				}else{
+					//カウント終了
+					status = PLAYING;
+					baseTime += tempo;
+					count = 1;
+					lamp = lampB;
+//					alpha = (int)(255 * (1.0 - ((double)time - baseTime)/tempo));
+					alpha = 255;
+				}
+				doDraw(lamp,alpha);
+			}else if(status==PLAYING){
 				//カウント表示
-				//コード移動・追加生成
-				doDrow();
+				long time = System.currentTimeMillis();
+				int alpha = 0;
+				if(time < baseTime + tempo){
+					//カウント更新なし
+					alpha = (int)(255 * (1.0 - ((double)time - baseTime)/tempo));
+				}else if(count < rhythm){
+					//カウント更新
+					baseTime += tempo;
+					count++;
+//					alpha = (int)(255 * (1.0 - ((double)time - baseTime)/tempo));
+					alpha = 255;
+				}else{
+					//次のコード
+					//コード移動・追加生成
+					codelist.remove(0);
+					codelist.add(codeNumber-1,
+							createOneCode(codelist.get(codeNumber-2)));
+					baseTime += tempo;
+					count = 1;
+//					alpha = (int)(255 * (1.0 - ((double)time - baseTime)/tempo));
+					alpha = 255;
+				}
+				doDraw(lampB,alpha);
 
-				break;
-
-			case PREPARE_STOP:
+			}else if(status==PREPARE_STOP){
 				synchronized (thread) {
 					try {
 						status = STOP;
+						//画面の初期化
+						doDraw();
 						thread.wait();
 					} catch (InterruptedException e) {
 						// TODO 自動生成された catch ブロック
@@ -276,11 +340,6 @@ implements SurfaceHolder.Callback, Runnable {
 						e.printStackTrace();
 					}
 				}
-
-				break;
-
-			default:
-				break;
 			}
 		}
 	}
