@@ -37,7 +37,8 @@ implements SurfaceHolder.Callback, Runnable {
 	//設定値
 	//　テンポ ＝　一分間(60000mills)に四分音符を何回打つか
 	//　600000 / テンポ ＝ １拍の長さ
-	private int tempo = 60000/96;
+	//private int tempo = 60000/96;
+	private int tempo = 60000/140;
 	private int rhythm = 4;
 
 	//コード関連
@@ -115,7 +116,7 @@ implements SurfaceHolder.Callback, Runnable {
 	}
 
 	public void doOnResume(Context cont){
-		soundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
+		soundPool = new SoundPool(2, AudioManager.STREAM_MUSIC, 0);
 		bell = soundPool.load(cont, R.raw.bell, 0);
 		tick = soundPool.load(cont, R.raw.tick, 0);
 	}
@@ -301,23 +302,30 @@ implements SurfaceHolder.Callback, Runnable {
 				//カウント開始
 				status = COUNT;
 				baseTime = System.currentTimeMillis();
-				count = 1;
+				count = 0;
 			}else if(status==COUNT){
 				//カウント表示処理
 				long time = System.currentTimeMillis();
 				int alpha = 0;
+				Bitmap lamp = null;
 				int sound = 0;
-				Bitmap lamp = lampR;
-				if(time < baseTime + tempo){
-					//カウント更新なし
+				//最初のカウント
+				if(count==0){
 					lamp = lampR;
-					alpha = (int)(255 * (1.0 - ((double)time - baseTime)/tempo));
+					alpha = 255;
+					sound = tick;
+					count = 1;
+				}
+				if(time < baseTime + tempo/2){
+					//カウント更新なし
+				}else if(time < baseTime + tempo){
+					lamp = lampR;
+					alpha = 50;
 				}else if(count < rhythm){
 					//カウント更新
 					baseTime += tempo;
 					count++;
 					lamp = lampR;
-//					alpha = (int)(255 * (1.0 - ((double)time - baseTime)/tempo));
 					alpha = 255;
 					sound = tick;
 				}else{
@@ -326,25 +334,32 @@ implements SurfaceHolder.Callback, Runnable {
 					baseTime += tempo;
 					count = 1;
 					lamp = lampB;
-//					alpha = (int)(255 * (1.0 - ((double)time - baseTime)/tempo));
+					sound = bell;
 					alpha = 255;
 				}
-				doDraw(lamp,alpha);
-				if(sound!=0){
-					soundPool.play(sound, 1.0F, 1.0F, 0, 0, 1.0F);
+				if(lamp!=null){
+					if(sound!=0){
+						soundPool.play(sound, 1.0F, 1.0F, 0, 0, 1.0F);
+					}
+					doDraw(lamp,alpha);
 				}
 			}else if(status==PLAYING){
 				//カウント表示
 				long time = System.currentTimeMillis();
 				int alpha = 0;
-				if(time < baseTime + tempo){
+				Bitmap lamp = null;
+				int sound = 0;
+				if(time < baseTime + tempo/2){
 					//カウント更新なし
-					alpha = (int)(255 * (1.0 - ((double)time - baseTime)/tempo));
+				}else if(time < baseTime + tempo){
+					lamp = lampB;
+					alpha = 50;
 				}else if(count < rhythm){
 					//カウント更新
 					baseTime += tempo;
 					count++;
-//					alpha = (int)(255 * (1.0 - ((double)time - baseTime)/tempo));
+					lamp = lampB;
+					sound = tick;
 					alpha = 255;
 				}else{
 					//次のコード
@@ -354,10 +369,16 @@ implements SurfaceHolder.Callback, Runnable {
 							createOneCode(codelist.get(codeNumber-2)));
 					baseTime += tempo;
 					count = 1;
-//					alpha = (int)(255 * (1.0 - ((double)time - baseTime)/tempo));
+					lamp = lampB;
+					sound = bell;
 					alpha = 255;
 				}
-				doDraw(lampB,alpha);
+				if(lamp!=null){
+					if(sound!=0){
+						soundPool.play(sound, 1.0F, 1.0F, 0, 0, 1.0F);
+					}
+					doDraw(lamp,alpha);
+				}
 
 			}else if(status==PREPARE_STOP){
 				synchronized (thread) {
