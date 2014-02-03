@@ -48,14 +48,14 @@ implements OnClickListener, OnCheckedChangeListener {
 	@Override
 	protected void onPause() {
 		changeUIforWaiting();
-		codeView.stopPlaying();
+		codeView.doOnPause(getApplicationContext());
 		super.onPause();
 	}
 
 	@Override
 	protected void onResume() {
-		// TODO 自動生成されたメソッド・スタブ
 		super.onResume();
+		codeView.doOnResume(getApplicationContext());
 	}
 
 	@Override

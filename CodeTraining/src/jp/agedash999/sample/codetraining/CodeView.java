@@ -11,6 +11,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -28,6 +30,9 @@ implements SurfaceHolder.Callback, Runnable {
 	private Paint paint = new Paint();
 	private long baseTime;
 	private int count;
+	private SoundPool soundPool;
+	private int bell;
+	private int tick;
 
 	//設定値
 	//　テンポ ＝　一分間(60000mills)に四分音符を何回打つか
@@ -59,7 +64,8 @@ implements SurfaceHolder.Callback, Runnable {
 	//画面表示位置関連
 	private int canvasWidth;
 	private int canvasHeight;
-	private int[] size;
+	private int[] width;
+	private int[] height;
 	private int[] srcX;
 	private int[] srcY;
 	private int[] dstX;
@@ -68,6 +74,8 @@ implements SurfaceHolder.Callback, Runnable {
 	private int lampSrcY;
 	private int lampDstX;
 	private int lampDstY;
+
+	private int bgColor = Color.DKGRAY;
 
 
 	public CodeView(Context context, SurfaceView sv){
@@ -85,7 +93,8 @@ implements SurfaceHolder.Callback, Runnable {
 				(CodeView.context.getResources(), R.drawable.lamp_b);
 
 		//画面表示配列の初期化
-		size = new int[codeNumber];
+		width = new int[codeNumber];
+		height = new int[codeNumber];
 		srcX = new int[codeNumber];
 		srcY = new int[codeNumber];
 		dstX = new int[codeNumber];
@@ -99,50 +108,69 @@ implements SurfaceHolder.Callback, Runnable {
 	public void surfaceCreated(SurfaceHolder holder) {
 		// TODO 画面生成後の初期処理
 		Canvas canvas = holder.lockCanvas();
-		//		canvas.drawColor(Color.GRAY);
+		canvas.drawColor(bgColor);
 		setScreenParm(canvas);
 		holder.unlockCanvasAndPost(canvas);
 		doDraw();
 	}
 
+	public void doOnResume(Context cont){
+		soundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
+		bell = soundPool.load(cont, R.raw.bell, 0);
+		tick = soundPool.load(cont, R.raw.tick, 0);
+	}
+
+	public void doOnPause(Context cont){
+		stopPlaying();
+		soundPool.release();
+	}
+
 	private void setScreenParm(Canvas canvas) {
 		canvasWidth = canvas.getWidth();
 		canvasHeight = canvas.getHeight();
-		int base = canvasWidth/100;
-		size[0] = base * 25;
-		size[1] = base * 15;
-		size[2] = base * 15;
-		size[3] = base * 15;
 
-		srcY[0] = base * 6;
-		dstY[0] = srcY[0] + size[0];
+		int baseWidth = canvasWidth/100;
+		width[0] = baseWidth * 30;
+		width[1] = baseWidth * 20;
+		width[2] = baseWidth * 20;
+		width[3] = baseWidth * 20;
 
-		srcY[1] = dstY[0] + base * 6;
-		dstY[1] = srcY[1] + size[1];
+		srcY[0] = baseWidth * 3;
+		dstY[0] = srcY[0] + width[0];
 
-		srcY[2] = dstY[1] + base * 6;
-		dstY[2] = srcY[2] + size[2];
+		srcY[1] = dstY[0] + baseWidth * 3;
+		dstY[1] = srcY[1] + width[1];
 
-		srcY[3] = dstY[2] + base * 6;
-		dstY[3] = srcY[3] + size[3];
+		srcY[2] = dstY[1] + baseWidth * 3;
+		dstY[2] = srcY[2] + width[2];
 
-		lampSrcY = dstY[0] + base * 3;
-		lampDstY = lampSrcY + base * 5;
+		srcY[3] = dstY[2] + baseWidth * 3;
+		dstY[3] = srcY[3] + width[3];
 
-		srcX[0] = ( canvasHeight - size[0] ) / 2 ;
-		dstX[0] = srcX[0] + size[0] ;
+		lampSrcY = dstY[0] + baseWidth * 5;
+		lampDstY = lampSrcY + baseWidth * 5;
+
+		int baseHeight = canvasHeight/100;
+		height[0] = baseHeight * 60;
+		height[1] = baseHeight * 40;
+		height[2] = baseHeight * 40;
+		height[3] = baseHeight * 40;
+
+
+		srcX[0] = ( canvasHeight - height[0] ) / 2 ;
+		dstX[0] = srcX[0] + height[0] ;
 
 		dstX[1] = dstX[0];
-		srcX[1] = dstX[1] - size[1] ;
+		srcX[1] = dstX[1] - height[1] ;
 
 		dstX[2] = dstX[0];
-		srcX[2] = dstX[2] - size[2] ;
+		srcX[2] = dstX[2] - height[2] ;
 
 		dstX[3] = dstX[0];
-		srcX[3] = dstX[3] - size[3] ;
+		srcX[3] = dstX[3] - height[3] ;
 
-		lampSrcX = srcX[0];
-		lampDstX = lampSrcX + base * 5;
+		lampSrcX = srcX[0] - baseWidth * 5;
+		lampDstX = srcX[0];
 
 	}
 
@@ -200,11 +228,11 @@ implements SurfaceHolder.Callback, Runnable {
 			//TODO 後ほど 設定に従って生成するロジック
 			//Rootの生成
 
-			int n = (int)(Math.random() * (EnumSet.allOf(CodeRoot.class).size()-1));
+			int n = (int)(Math.random() * (EnumSet.allOf(CodeRoot.class).size()));
 			root = CodeRoot.values()[n];
-			n = (int)(Math.random() * (EnumSet.allOf(CodeForm.class).size()));
+			n = (int)(Math.random() * (EnumSet.allOf(CodeForm.class).size()+1));
 			if(n!=0){
-				root = CodeRoot.values()[n-1];
+				form = CodeForm.values()[n - 1];
 			}
 		}else{
 			//TODO 後ほど 25フラグに応じて生成するロジック
@@ -222,7 +250,7 @@ implements SurfaceHolder.Callback, Runnable {
 		Rect srcRect = new Rect();
 		Rect dstRect = new Rect();
 
-		canvas.drawColor(Color.GRAY);
+		canvas.drawColor(bgColor);
 
 		//コードの描画
 		for(int i = 0; i < codeNumber ; i++){
@@ -278,6 +306,7 @@ implements SurfaceHolder.Callback, Runnable {
 				//カウント表示処理
 				long time = System.currentTimeMillis();
 				int alpha = 0;
+				int sound = 0;
 				Bitmap lamp = lampR;
 				if(time < baseTime + tempo){
 					//カウント更新なし
@@ -290,6 +319,7 @@ implements SurfaceHolder.Callback, Runnable {
 					lamp = lampR;
 //					alpha = (int)(255 * (1.0 - ((double)time - baseTime)/tempo));
 					alpha = 255;
+					sound = tick;
 				}else{
 					//カウント終了
 					status = PLAYING;
@@ -300,6 +330,9 @@ implements SurfaceHolder.Callback, Runnable {
 					alpha = 255;
 				}
 				doDraw(lamp,alpha);
+				if(sound!=0){
+					soundPool.play(sound, 1.0F, 1.0F, 0, 0, 1.0F);
+				}
 			}else if(status==PLAYING){
 				//カウント表示
 				long time = System.currentTimeMillis();
