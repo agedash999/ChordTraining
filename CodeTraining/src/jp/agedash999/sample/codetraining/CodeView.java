@@ -11,6 +11,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.util.Log;
@@ -39,7 +40,8 @@ implements SurfaceHolder.Callback, Runnable {
 	//　テンポ ＝　一分間(60000mills)に四分音符を何回打つか
 	//　600000 / テンポ ＝ １拍の長さ
 	//private int tempo = 60000/96;
-	private int tempo = 60000/140;
+	private int tempo = 96;
+	private int millsPerNote = 60000/tempo;
 	private int rhythm = 4;
 
 	//コード関連
@@ -77,12 +79,13 @@ implements SurfaceHolder.Callback, Runnable {
 	private int lampDstX;
 	private int lampDstY;
 
-	private int bgColor = Color.DKGRAY;
+	private int bgColor = Color.rgb(201, 201, 196);
 
 	private Rect codeSrcRect;
 	private Rect lampSrcRect;
-	private Rect codeDstRect;
+	private RectF codeDstRectF;
 	private Rect lampDstRect;
+	private int r;
 
 	public CodeView(Context context, SurfaceView sv){
 		CodeView.context = context;
@@ -106,7 +109,7 @@ implements SurfaceHolder.Callback, Runnable {
 
 		codeSrcRect = new Rect();
 		lampSrcRect = new Rect();
-		codeDstRect = new Rect();
+		codeDstRectF = new RectF();
 		lampDstRect = new Rect();
 
 		//画面表示配列の初期化
@@ -190,6 +193,8 @@ implements SurfaceHolder.Callback, Runnable {
 		lampSrcX = srcX[0] - baseWidth * 5;
 		lampDstX = srcX[0];
 
+		r = height[0] / 10;
+
 	}
 
 	@Override
@@ -237,6 +242,11 @@ implements SurfaceHolder.Callback, Runnable {
 		}
 	}
 
+	public void changeTempo(int tempo){
+		this.tempo = tempo;
+		this.millsPerNote = 60000/tempo;
+	}
+
 	private Code createOneCode(Code prev){
 		//コードを生成する
 		CodeRoot root = null;
@@ -279,19 +289,20 @@ implements SurfaceHolder.Callback, Runnable {
 
 		//コードの描画
 		for(int i = 0; i < codeNumber ; i++){
-			codeDstRect.set(srcY[i],srcX[i],dstY[i],dstX[i]);
-			canvas.drawRect(codeDstRect, whitePaint);
+			codeDstRectF.set(srcY[i],srcX[i],dstY[i],dstX[i]);
+//			canvas.drawRect(codeDstRect, whitePaint);
+			canvas.drawRoundRect(codeDstRectF, r, r, whitePaint);
 			//			canvas.drawBitmap(whiteRect, srcRect, dstRect, null);
 			if(i < codelist.size()){
 				Code code = codelist.get(i);
-				canvas.drawBitmap(code.root.Image(), codeSrcRect, codeDstRect, null);
+				canvas.drawBitmap(code.root.Image(), codeSrcRect, codeDstRectF, null);
 				if(code.form!=null){
-					canvas.drawBitmap(code.form.Image(), codeSrcRect, codeDstRect, null);
+					canvas.drawBitmap(code.form.Image(), codeSrcRect, codeDstRectF, null);
 				}
 				if(code.tensions!=null && code.tensions.length!=0){
-					canvas.drawBitmap(parenthesis, codeSrcRect, codeDstRect, null);
+					canvas.drawBitmap(parenthesis, codeSrcRect, codeDstRectF, null);
 					for(CodeTension tension : code.tensions){
-						canvas.drawBitmap(tension.Image(), codeSrcRect, codeDstRect, null);
+						canvas.drawBitmap(tension.Image(), codeSrcRect, codeDstRectF, null);
 					}
 				}
 			}
@@ -338,14 +349,14 @@ implements SurfaceHolder.Callback, Runnable {
 					sound = tick;
 					count = 1;
 				}
-				if(time < baseTime + tempo/2){
+				if(time < baseTime + millsPerNote/2){
 					//カウント更新なし
-				}else if(time < baseTime + tempo){
+				}else if(time < baseTime + millsPerNote){
 					lamp = lampB;
 					alpha = 50;
 				}else if(count < rhythm){
 					//カウント更新
-					baseTime += tempo;
+					baseTime += millsPerNote;
 					count++;
 					lamp = lampB;
 					alpha = 255;
@@ -353,7 +364,7 @@ implements SurfaceHolder.Callback, Runnable {
 				}else{
 					//カウント終了
 					status = PLAYING;
-					baseTime += tempo;
+					baseTime += millsPerNote;
 					count = 1;
 					lamp = lampR;
 					sound = bell;
@@ -371,9 +382,9 @@ implements SurfaceHolder.Callback, Runnable {
 				int alpha = 0;
 				Bitmap lamp = null;
 				int sound = 0;
-				if(time < baseTime + tempo/2){
+				if(time < baseTime + millsPerNote/2){
 					//カウント更新なし
-				}else if(time < baseTime + tempo){
+				}else if(time < baseTime + millsPerNote){
 					if(count==1){
 						lamp = lampR;
 					}else{
@@ -382,7 +393,7 @@ implements SurfaceHolder.Callback, Runnable {
 					alpha = 50;
 				}else if(count < rhythm){
 					//カウント更新
-					baseTime += tempo;
+					baseTime += millsPerNote;
 					count++;
 					lamp = lampB;
 					sound = tick;
@@ -393,7 +404,7 @@ implements SurfaceHolder.Callback, Runnable {
 					codelist.remove(0);
 					codelist.add(codeNumber-1,
 							createOneCode(codelist.get(codeNumber-2)));
-					baseTime += tempo;
+					baseTime += millsPerNote;
 					count = 1;
 					lamp = lampR;
 					sound = bell;

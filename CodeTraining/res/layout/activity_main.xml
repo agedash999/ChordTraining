@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:background="#c9c9c4" >
 
     <SurfaceView
         android:id="@+id/sv_main"
@@ -13,33 +14,120 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:baselineAligned="false"
+        android:padding="5dp"
+        android:background="@drawable/roundedrect_white"
+        >
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginRight="2dp"
+            android:background="@drawable/roundedrect_dgray"
+            android:padding="5dp"
+            >
 
             <Button
                 android:id="@+id/btn_start"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="40dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="2dp"
+                android:background="@drawable/shape_button"
                 android:text="@string/button_start" />
 
             <Button
                 android:id="@+id/btn_stop"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="40dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="2dp"
+                android:background="@drawable/shape_button"
                 android:text="@string/button_stop" />
 
         </LinearLayout>
 
-        <CheckBox
-            android:id="@+id/cbx_251"
+        <LinearLayout
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_weight="1"
+            android:background="@drawable/roundedrect_dgray"
+            android:padding="5dp" >
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="2dp"
+                android:background="@drawable/roundedrect_white"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:id="@+id/txv_tempo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center_vertical"
+                    android:text="@string/txv_title_tempo"
+                    android:textColor="@android:color/black"
+                    android:textSize="20sp"
+                    />
+
+                <EditText
+                    android:id="@+id/edt_tempo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="right"
+                    android:ems="3"
+                    android:inputType="number"
+                    android:maxLength="3"
+                    >
+
+                    <requestFocus />
+                </EditText>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+				>
+
+                <SeekBar
+                    android:id="@+id/skb_tempo"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="2dp"
+                    android:background="@drawable/roundedrect_white"
+                    />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/cbx_251" />
+            android:layout_height="match_parent"
+            android:layout_marginLeft="2dp"
+            android:background="@drawable/roundedrect_dgray"
+            android:gravity="center_vertical"
+            android:padding="5dp" >
+
+            <CheckBox
+                android:id="@+id/cbx_251"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="@string/cbx_251"
+                android:textColor="@android:color/black"
+                android:background="@drawable/roundedrect_white"
+                />
+
+        </RelativeLayout>
 
     </LinearLayout>
 

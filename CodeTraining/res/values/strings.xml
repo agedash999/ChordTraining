@@ -7,5 +7,6 @@
     <string name="button_start">Start</string>
     <string name="button_stop">Stop</string>
     <string name="cbx_251">2/5/1進行</string>
+    <string name="txv_title_tempo">tempo</string>
 
 </resources>
