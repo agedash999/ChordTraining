@@ -23,11 +23,12 @@ implements SurfaceHolder.Callback, Runnable {
 	private SurfaceHolder holder;
 	private Thread thread;
 	private static Context context;
-	private Bitmap whiteRect;
+	//	private Bitmap whiteRect;
 	private Bitmap lampR;
 	private Bitmap lampB;
 	private Bitmap parenthesis;
-	private Paint paint = new Paint();
+	private Paint lampPaint = new Paint();
+	private Paint whitePaint = new Paint();
 	private long baseTime;
 	private int count;
 	private SoundPool soundPool;
@@ -78,6 +79,10 @@ implements SurfaceHolder.Callback, Runnable {
 
 	private int bgColor = Color.DKGRAY;
 
+	private Rect codeSrcRect;
+	private Rect lampSrcRect;
+	private Rect codeDstRect;
+	private Rect lampDstRect;
 
 	public CodeView(Context context, SurfaceView sv){
 		CodeView.context = context;
@@ -86,12 +91,23 @@ implements SurfaceHolder.Callback, Runnable {
 		holder = sv.getHolder();
 		holder.addCallback( this );
 
-		whiteRect = BitmapFactory.decodeResource
-				(CodeView.context.getResources(), R.drawable.white);
+		//Threadの作成
+		this.thread = new Thread(this);
+	}
+
+	@Override
+	public void surfaceCreated(SurfaceHolder holder) {
+		//		whiteRect = BitmapFactory.decodeResource
+		//		(CodeView.context.getResources(), R.drawable.white);
 		lampR =  BitmapFactory.decodeResource
 				(CodeView.context.getResources(), R.drawable.lamp_r);
 		lampB =  BitmapFactory.decodeResource
 				(CodeView.context.getResources(), R.drawable.lamp_b);
+
+		codeSrcRect = new Rect();
+		lampSrcRect = new Rect();
+		codeDstRect = new Rect();
+		lampDstRect = new Rect();
 
 		//画面表示配列の初期化
 		width = new int[codeNumber];
@@ -101,17 +117,18 @@ implements SurfaceHolder.Callback, Runnable {
 		dstX = new int[codeNumber];
 		dstY = new int[codeNumber];
 
-		//Threadの作成
-		this.thread = new Thread(this);
-	}
-
-	@Override
-	public void surfaceCreated(SurfaceHolder holder) {
 		// TODO 画面生成後の初期処理
 		Canvas canvas = holder.lockCanvas();
 		canvas.drawColor(bgColor);
 		setScreenParm(canvas);
 		holder.unlockCanvasAndPost(canvas);
+
+		Bitmap code1 = CodeRoot.values()[0].Image();
+		codeSrcRect.set(0,0,code1.getWidth(),code1.getHeight());
+		lampSrcRect.set(0,0,lampR.getWidth(),lampR.getHeight());
+		lampDstRect.set(lampSrcY,lampSrcX,lampDstY,lampDstX);
+		whitePaint.setColor(Color.WHITE);
+
 		doDraw();
 	}
 
@@ -229,9 +246,19 @@ implements SurfaceHolder.Callback, Runnable {
 			//TODO 後ほど 設定に従って生成するロジック
 			//Rootの生成
 
-			int n = (int)(Math.random() * (EnumSet.allOf(CodeRoot.class).size()));
+			double rand;
+			int n;
+
+			rand = Math.random() * (EnumSet.allOf(CodeRoot.class).size());
+			Log.d(logTag,"random1:" + rand);
+			n = (int)rand;
+//			n = (int)(Math.random() * (EnumSet.allOf(CodeRoot.class).size()));
 			root = CodeRoot.values()[n];
-			n = (int)(Math.random() * (EnumSet.allOf(CodeForm.class).size()+1));
+
+			rand = Math.random() * (EnumSet.allOf(CodeForm.class).size()+1);
+			Log.d(logTag,"random2:" + rand);
+			n =  (int)rand;
+//			n = (int)(Math.random() * (EnumSet.allOf(CodeForm.class).size()+1));
 			if(n!=0){
 				form = CodeForm.values()[n - 1];
 			}
@@ -248,35 +275,30 @@ implements SurfaceHolder.Callback, Runnable {
 	private void doDraw(Bitmap lamp,int alpha){
 		//画面描画
 		Canvas canvas = holder.lockCanvas();
-		Rect srcRect = new Rect();
-		Rect dstRect = new Rect();
-
 		canvas.drawColor(bgColor);
 
 		//コードの描画
 		for(int i = 0; i < codeNumber ; i++){
-			srcRect.set(0,0,whiteRect.getWidth(),whiteRect.getHeight());
-			dstRect.set(srcY[i],srcX[i],dstY[i],dstX[i]);
-			canvas.drawBitmap(whiteRect, srcRect, dstRect, null);
+			codeDstRect.set(srcY[i],srcX[i],dstY[i],dstX[i]);
+			canvas.drawRect(codeDstRect, whitePaint);
+			//			canvas.drawBitmap(whiteRect, srcRect, dstRect, null);
 			if(i < codelist.size()){
 				Code code = codelist.get(i);
-				canvas.drawBitmap(code.root.Image(), srcRect, dstRect, null);
+				canvas.drawBitmap(code.root.Image(), codeSrcRect, codeDstRect, null);
 				if(code.form!=null){
-					canvas.drawBitmap(code.form.Image(), srcRect, dstRect, null);
+					canvas.drawBitmap(code.form.Image(), codeSrcRect, codeDstRect, null);
 				}
 				if(code.tensions!=null && code.tensions.length!=0){
-					canvas.drawBitmap(parenthesis, srcRect, dstRect, null);
+					canvas.drawBitmap(parenthesis, codeSrcRect, codeDstRect, null);
 					for(CodeTension tension : code.tensions){
-						canvas.drawBitmap(tension.Image(), srcRect, dstRect, null);
+						canvas.drawBitmap(tension.Image(), codeSrcRect, codeDstRect, null);
 					}
 				}
 			}
 		}
 		//TODO ランプの描画
-		srcRect.set(0,0,lamp.getWidth(),lamp.getHeight());
-		dstRect.set(lampSrcY,lampSrcX,lampDstY,lampDstX);
-		paint.setAlpha(alpha);
-		canvas.drawBitmap(lamp,srcRect,dstRect, paint);
+		lampPaint.setAlpha(alpha);
+		canvas.drawBitmap(lamp,lampSrcRect,lampDstRect, lampPaint);
 
 
 		holder.unlockCanvasAndPost(canvas);
@@ -311,7 +333,7 @@ implements SurfaceHolder.Callback, Runnable {
 				int sound = 0;
 				//最初のカウント
 				if(count==0){
-					lamp = lampR;
+					lamp = lampB;
 					alpha = 255;
 					sound = tick;
 					count = 1;
@@ -319,13 +341,13 @@ implements SurfaceHolder.Callback, Runnable {
 				if(time < baseTime + tempo/2){
 					//カウント更新なし
 				}else if(time < baseTime + tempo){
-					lamp = lampR;
+					lamp = lampB;
 					alpha = 50;
 				}else if(count < rhythm){
 					//カウント更新
 					baseTime += tempo;
 					count++;
-					lamp = lampR;
+					lamp = lampB;
 					alpha = 255;
 					sound = tick;
 				}else{
@@ -333,7 +355,7 @@ implements SurfaceHolder.Callback, Runnable {
 					status = PLAYING;
 					baseTime += tempo;
 					count = 1;
-					lamp = lampB;
+					lamp = lampR;
 					sound = bell;
 					alpha = 255;
 				}
@@ -352,7 +374,11 @@ implements SurfaceHolder.Callback, Runnable {
 				if(time < baseTime + tempo/2){
 					//カウント更新なし
 				}else if(time < baseTime + tempo){
-					lamp = lampB;
+					if(count==1){
+						lamp = lampR;
+					}else{
+						lamp = lampB;
+					}
 					alpha = 50;
 				}else if(count < rhythm){
 					//カウント更新
@@ -369,7 +395,7 @@ implements SurfaceHolder.Callback, Runnable {
 							createOneCode(codelist.get(codeNumber-2)));
 					baseTime += tempo;
 					count = 1;
-					lamp = lampB;
+					lamp = lampR;
 					sound = bell;
 					alpha = 255;
 				}
