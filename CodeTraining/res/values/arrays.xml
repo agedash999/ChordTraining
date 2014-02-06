@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="entries_rhythm">
+        <item >4/4</item>
+        <item >3/4</item>
+    </string-array>
+    <string-array name="entryvalues_rhythm">
+        <item >4</item>
+        <item >3</item>
+    </string-array>
+    <string-array name="entries_freq">
+        <item >多め</item>
+        <item >標準</item>
+        <item >少なめ</item>
+        <item >なし</item>
+    </string-array>
+    <string-array name="entryvalues_freq">
+        <item >3</item>
+        <item >2</item>
+        <item >1</item>
+        <item >0</item>
+    </string-array>
+</resources>

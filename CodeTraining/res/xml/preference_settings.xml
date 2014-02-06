@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    <ListPreference android:title="Rhythm"
+        android:key="@string/pref_rhythm"
+        android:entries="@array/entries_rhythm"
+        android:entryValues="@array/entryvalues_rhythm"
+        android:defaultValue="4"
+        />
+    <PreferenceCategory
+        android:title="Code Type">
+        <ListPreference
+            android:title="@string/pref_major_code"
+            android:key="@string/pref_major_code"
+         	android:entries="@array/entries_freq"
+	        android:entryValues="@array/entryvalues_freq"
+	        android:defaultValue="3"
+	    />
+        <ListPreference
+            android:title="@string/pref_minor_code"
+            android:key="@string/pref_minor_code"
+         	android:entries="@array/entries_freq"
+	        android:entryValues="@array/entryvalues_freq"
+	        android:defaultValue="3"
+	    />
+        <ListPreference
+            android:title="@string/pref_7th_code"
+            android:key="@string/pref_7th_code"
+         	android:entries="@array/entries_freq"
+	        android:entryValues="@array/entryvalues_freq"
+	        android:defaultValue="2"
+	    />
+        <ListPreference
+            android:title="@string/pref_major7th_code"
+            android:key="@string/pref_major7th_code"
+         	android:entries="@array/entries_freq"
+	        android:entryValues="@array/entryvalues_freq"
+	        android:defaultValue="2"
+	    />
+        <ListPreference
+            android:title="@string/pref_minor7th_code"
+            android:key="@string/pref_minor7th_code"
+         	android:entries="@array/entries_freq"
+	        android:entryValues="@array/entryvalues_freq"
+	        android:defaultValue="2"
+	    />
+        <ListPreference
+            android:title="@string/pref_minorm7th_code"
+            android:key="@string/pref_minorm7th_code"
+         	android:entries="@array/entries_freq"
+	        android:entryValues="@array/entryvalues_freq"
+	        android:defaultValue="0"
+	    />
+        <ListPreference
+            android:title="@string/pref_diminish_code"
+            android:key="@string/pref_diminish_code"
+         	android:entries="@array/entries_freq"
+	        android:entryValues="@array/entryvalues_freq"
+	        android:defaultValue="0"
+	    />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="Tension">
+
+
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="Other">
+        <CheckBoxPreference
+            android:title="@string/pref_restore_default"
+        	android:key="@string/pref_restore_default"
+        	android:defaultValue="false"
+        />
+        <jp.agedash999.sample.codetraining.RestoreDefaultDialog
+            android:title="@string/pref_restore_default"
+        	android:key="@string/pref_restore_default"
+        	android:dialogMessage="@string/msg_restore_default"
+        />
+    </PreferenceCategory>
+
+
+</PreferenceScreen>
