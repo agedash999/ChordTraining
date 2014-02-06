@@ -7,6 +7,16 @@
     <string name="button_start">Start</string>
     <string name="button_stop">Stop</string>
     <string name="cbx_251">2/5/1進行</string>
-    <string name="txv_title_tempo">tempo</string>
-
+    <string name="txv_title_tempo">Tempo</string>
+    <string name="pref_rhythm">Rhythm</string>
+    <string name="pref_major_code">Major Code</string>
+    <string name="pref_minor_code">Minor Code</string>
+    <string name="pref_7th_code">7 Code</string>
+    <string name="pref_major7th_code">M7 Code</string>
+    <string name="pref_minor7th_code">m7 Code</string>
+    <string name="pref_minorm7th_code">Minor M7 Code</string>
+    <string name="pref_diminish_code">Dim Code</string>
+    <string name="pref_restore_default">Restore Default</string>
+    <string name="key_restore_default">restore_default</string>
+    <string name="msg_restore_default">すべての設定を初期値に戻しますか？</string>
 </resources>

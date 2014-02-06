@@ -1,11 +1,13 @@
 package jp.agedash999.sample.codetraining;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -24,6 +26,8 @@ implements OnClickListener, OnCheckedChangeListener, OnSeekBarChangeListener, Te
 	private final int TEMPO_MIN = 40;
 	private final int TEMPO_DEFO = 96;
 	private final int TEMPO_MAX = 208;
+
+	private final int RQC_SETTINGS = 0;
 
 	private SurfaceView sv; //標準のSV？
 	private CodeView codeView;
@@ -90,6 +94,27 @@ implements OnClickListener, OnCheckedChangeListener, OnSeekBarChangeListener, Te
 	}
 
 	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.action_settings:
+			Intent intent = new Intent(this, SettingsActivity.class);
+			startActivityForResult(intent, RQC_SETTINGS);
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	protected void onActivityResult(
+			int requestCode,
+			int resultCode,
+			Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if (RQC_SETTINGS == resultCode){
+
+		}
+		// TODO 設定画面の変更値を受け取る
+	}
+	@Override
 	public void onClick(View v) {
 
 		switch (v.getId()) {
@@ -127,26 +152,26 @@ implements OnClickListener, OnCheckedChangeListener, OnSeekBarChangeListener, Te
 	@Override
 	public void onProgressChanged(SeekBar seekBar, int progress, boolean fromTouch) {
 		int tempo = progress + TEMPO_MIN;
-    	codeView.changeTempo(tempo);
+		codeView.changeTempo(tempo);
 		edt_tempo.setText(Integer.toString(tempo));
 	}
 
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-    	String str = s.toString();
-    	int tempo = 56;
-    	try{
-    		tempo = Integer.parseInt(str);
-    	}catch(NumberFormatException e){
-    		//数値以外が入力された場合　基本ないはず
-    	}
-    	if(tempo<TEMPO_MIN){
-    		tempo = TEMPO_MIN;
-    	}else if(TEMPO_MAX < tempo){
-    		tempo = TEMPO_MAX;
-    	}
-    	codeView.changeTempo(tempo);
-    	skb_tempo.setProgress(tempo-TEMPO_MIN);
-    }
+	public void onTextChanged(CharSequence s, int start, int before, int count) {
+		String str = s.toString();
+		int tempo = 56;
+		try{
+			tempo = Integer.parseInt(str);
+		}catch(NumberFormatException e){
+			//数値以外が入力された場合　基本ないはず
+		}
+		if(tempo<TEMPO_MIN){
+			tempo = TEMPO_MIN;
+		}else if(TEMPO_MAX < tempo){
+			tempo = TEMPO_MAX;
+		}
+		codeView.changeTempo(tempo);
+		skb_tempo.setProgress(tempo-TEMPO_MIN);
+	}
 
 	private void changeUIforPlaying(){
 		//TODO ボタン切替 ハンドリング方法問題ないか
