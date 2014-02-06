@@ -3,8 +3,6 @@ package jp.agedash999.sample.codetraining;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,16 +13,16 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.TextView;
 
 public class MainActivity
 extends Activity
-implements OnClickListener, OnCheckedChangeListener, OnSeekBarChangeListener, TextWatcher {
+implements OnClickListener, OnCheckedChangeListener, OnSeekBarChangeListener{
 
 	private final int TEMPO_MIN = 40;
-	private final int TEMPO_DEFO = 96;
+	private final int TEMPO_DEFA = 96;
 	private final int TEMPO_MAX = 208;
 
 	private final int RQC_SETTINGS = 0;
@@ -32,7 +30,7 @@ implements OnClickListener, OnCheckedChangeListener, OnSeekBarChangeListener, Te
 	private SurfaceView sv; //標準のSV？
 	private CodeView codeView;
 	private SeekBar skb_tempo;
-	private EditText edt_tempo;
+	private TextView txv_tempo;
 
 
 	//ログ関連
@@ -56,19 +54,19 @@ implements OnClickListener, OnCheckedChangeListener, OnSeekBarChangeListener, Te
 
 		//コントロールUIの取得
 		skb_tempo = (SeekBar)findViewById(R.id.skb_tempo);
-		edt_tempo = (EditText)findViewById(R.id.edt_tempo);
+		txv_tempo = (TextView)findViewById(R.id.txv_tempo);
 
 		//リスナー設定
 		((Button)findViewById(R.id.btn_start)).setOnClickListener(this);
 		((Button)findViewById(R.id.btn_stop)).setOnClickListener(this);
 		((CheckBox)findViewById(R.id.cbx_251)).setOnCheckedChangeListener(this);
 		skb_tempo.setOnSeekBarChangeListener(this);
-		edt_tempo.addTextChangedListener(this);
-		edt_tempo.setOnClickListener(this);
 
 		skb_tempo.setMax(TEMPO_MAX - TEMPO_MIN);
-		skb_tempo.setProgress(TEMPO_DEFO - TEMPO_MIN);
-		edt_tempo.setText(Integer.toString(TEMPO_DEFO));
+		int tempo = codeView.loadTempoFromPreference(TEMPO_DEFA);
+		skb_tempo.setProgress(tempo - TEMPO_MIN);
+//		skb_tempo.setProgress(TEMPO_DEFA - TEMPO_MIN);
+//		edt_tempo.setText(Integer.toString(TEMPO_DEFA));
 
 		changeUIforWaiting();
 	}
@@ -76,14 +74,18 @@ implements OnClickListener, OnCheckedChangeListener, OnSeekBarChangeListener, Te
 	@Override
 	protected void onPause() {
 		changeUIforWaiting();
-		codeView.doOnPause(getApplicationContext());
+		codeView.releaseSoundPool(getApplicationContext());
+		codeView.changeTempo(skb_tempo.getProgress() + TEMPO_MIN, true);
 		super.onPause();
 	}
 
 	@Override
 	protected void onResume() {
+		codeView.loadSoundPool(getApplicationContext());
+		codeView.loadPreference();
+		int tempo = codeView.loadTempoFromPreference(TEMPO_DEFA);
+		skb_tempo.setProgress(tempo - TEMPO_MIN);
 		super.onResume();
-		codeView.doOnResume(getApplicationContext());
 	}
 
 	@Override
@@ -110,9 +112,8 @@ implements OnClickListener, OnCheckedChangeListener, OnSeekBarChangeListener, Te
 			Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		if (RQC_SETTINGS == resultCode){
-
+			codeView.loadPreference();
 		}
-		// TODO 設定画面の変更値を受け取る
 	}
 	@Override
 	public void onClick(View v) {
@@ -152,26 +153,26 @@ implements OnClickListener, OnCheckedChangeListener, OnSeekBarChangeListener, Te
 	@Override
 	public void onProgressChanged(SeekBar seekBar, int progress, boolean fromTouch) {
 		int tempo = progress + TEMPO_MIN;
-		codeView.changeTempo(tempo);
-		edt_tempo.setText(Integer.toString(tempo));
+		codeView.changeTempo(tempo ,false);
+		txv_tempo.setText(Integer.toString(tempo));
 	}
 
-	public void onTextChanged(CharSequence s, int start, int before, int count) {
-		String str = s.toString();
-		int tempo = 56;
-		try{
-			tempo = Integer.parseInt(str);
-		}catch(NumberFormatException e){
-			//数値以外が入力された場合　基本ないはず
-		}
-		if(tempo<TEMPO_MIN){
-			tempo = TEMPO_MIN;
-		}else if(TEMPO_MAX < tempo){
-			tempo = TEMPO_MAX;
-		}
-		codeView.changeTempo(tempo);
-		skb_tempo.setProgress(tempo-TEMPO_MIN);
-	}
+//	public void onTextChanged(CharSequence s, int start, int before, int count) {
+//		String str = s.toString();
+//		int tempo = 56;
+//		try{
+//			tempo = Integer.parseInt(str);
+//		}catch(NumberFormatException e){
+//			//数値以外が入力された場合　基本ないはず
+//		}
+//		if(tempo<TEMPO_MIN){
+//			tempo = TEMPO_MIN;
+//		}else if(TEMPO_MAX < tempo){
+//			tempo = TEMPO_MAX;
+//		}
+//		codeView.changeTempo(tempo ,true);
+//		skb_tempo.setProgress(tempo-TEMPO_MIN);
+//	}
 
 	private void changeUIforPlaying(){
 		//TODO ボタン切替 ハンドリング方法問題ないか
@@ -195,18 +196,6 @@ implements OnClickListener, OnCheckedChangeListener, OnSeekBarChangeListener, Te
 
 	@Override
 	public void onStopTrackingTouch(SeekBar seekBar) {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
-
-	@Override
-	public void afterTextChanged(Editable arg0) {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
-
-	@Override
-	public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}

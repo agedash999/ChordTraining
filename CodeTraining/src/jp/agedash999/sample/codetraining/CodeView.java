@@ -2,9 +2,12 @@ package jp.agedash999.sample.codetraining;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -14,6 +17,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.media.AudioManager;
 import android.media.SoundPool;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -40,9 +44,10 @@ implements SurfaceHolder.Callback, Runnable {
 	//　テンポ ＝　一分間(60000mills)に四分音符を何回打つか
 	//　600000 / テンポ ＝ １拍の長さ
 	//private int tempo = 60000/96;
-	private int tempo = 96;
-	private int millsPerNote = 60000/tempo;
-	private int rhythm = 4;
+	private int millsPerNote; //TODO 起動時テンポ設定読み込み
+	private int rhythm;
+	private final String KEY_TEMPO = "key_tempo";
+
 
 	//コード関連
 	//	private Code[] codes;
@@ -50,6 +55,8 @@ implements SurfaceHolder.Callback, Runnable {
 	private final int codeNumber = 4;
 
 	public boolean twofiveFlag = false;
+	private Map<String,Integer> codeFormScope = new HashMap<String, Integer>();
+	private final String KEY_CODE_FORM_SUM = "code_form_sum";
 
 	//ループ処理のステータス
 	private int status;
@@ -135,13 +142,13 @@ implements SurfaceHolder.Callback, Runnable {
 		doDraw();
 	}
 
-	public void doOnResume(Context cont){
+	public void loadSoundPool(Context cont){
 		soundPool = new SoundPool(2, AudioManager.STREAM_MUSIC, 0);
 		bell = soundPool.load(cont, R.raw.bell, 0);
 		tick = soundPool.load(cont, R.raw.tick, 0);
 	}
 
-	public void doOnPause(Context cont){
+	public void releaseSoundPool(Context cont){
 		stopPlaying();
 		soundPool.release();
 	}
@@ -242,9 +249,46 @@ implements SurfaceHolder.Callback, Runnable {
 		}
 	}
 
-	public void changeTempo(int tempo){
-		this.tempo = tempo;
+	public void changeTempo(int tempo ,boolean isSavePreference){
 		this.millsPerNote = 60000/tempo;
+		if(isSavePreference){
+			SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+			pref.edit().putInt(KEY_TEMPO, tempo).apply();
+		}
+	}
+
+	public int loadTempoFromPreference(int defaultTempo){
+		int tempo = PreferenceManager.getDefaultSharedPreferences(context).getInt(KEY_TEMPO, 0);
+		if(tempo==0){
+			tempo = defaultTempo;
+		}
+		return tempo;
+	}
+
+
+	public void loadPreference(){
+		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+		String key_rhythm = context.getString(R.string.key_rhythm);
+		if(!pref.contains(key_rhythm)){
+
+		}
+
+		//リズム設定
+		rhythm = Integer.parseInt(pref.getString(context.getString(R.string.key_rhythm), "4"));
+
+		//コード種の設定取得・保存
+		codeFormScope.clear();
+		CodeForm[] forms = CodeForm.values();
+		int freq = 0;
+		int sum = 0;
+		for(int i = 0;i < forms.length;i++){
+			freq = Integer.parseInt(pref.getString(forms[i].name(), "0"));
+			codeFormScope.put(forms[i].name(),freq);
+			sum += freq;
+		}
+		codeFormScope.put(KEY_CODE_FORM_SUM, sum);
+
+		//TODO テンション設定取得・保存
 	}
 
 	private Code createOneCode(Code prev){
@@ -256,22 +300,34 @@ implements SurfaceHolder.Callback, Runnable {
 			//TODO 後ほど 設定に従って生成するロジック
 			//Rootの生成
 
-			double rand;
-			int n;
+			{
+				//CodeRootの決定
+				int random_int;
+				random_int = (int)(Math.random() * (EnumSet.allOf(CodeRoot.class).size()));
+				root = CodeRoot.values()[random_int];
 
-			rand = Math.random() * (EnumSet.allOf(CodeRoot.class).size());
-			Log.d(logTag,"random1:" + rand);
-			n = (int)rand;
-//			n = (int)(Math.random() * (EnumSet.allOf(CodeRoot.class).size()));
-			root = CodeRoot.values()[n];
-
-			rand = Math.random() * (EnumSet.allOf(CodeForm.class).size()+1);
-			Log.d(logTag,"random2:" + rand);
-			n =  (int)rand;
-//			n = (int)(Math.random() * (EnumSet.allOf(CodeForm.class).size()+1));
-			if(n!=0){
-				form = CodeForm.values()[n - 1];
 			}
+
+			{
+				//CodeFormの決定
+				double random_double;
+				random_double = Math.random() * codeFormScope.get(KEY_CODE_FORM_SUM);
+				CodeForm[] forms = CodeForm.values();
+				int meter = 0;
+				int i = 0;
+				meter += codeFormScope.get(forms[i].name());
+				while(i< forms.length && meter < random_double){
+					i++;
+					meter += codeFormScope.get(forms[i].name());
+				}
+				form = forms[i];
+			}
+
+			//			n =  (int)rand;
+			//			n = (int)(Math.random() * (EnumSet.allOf(CodeForm.class).size()+1));
+			//			if(n!=0){
+			//				form = CodeForm.values()[n - 1];
+			//			}
 		}else{
 			//TODO 後ほど 25フラグに応じて生成するロジック
 			//TODO 後ほど 設定に従って生成するロジック
@@ -290,7 +346,7 @@ implements SurfaceHolder.Callback, Runnable {
 		//コードの描画
 		for(int i = 0; i < codeNumber ; i++){
 			codeDstRectF.set(srcY[i],srcX[i],dstY[i],dstX[i]);
-//			canvas.drawRect(codeDstRect, whitePaint);
+			//			canvas.drawRect(codeDstRect, whitePaint);
 			canvas.drawRoundRect(codeDstRectF, r, r, whitePaint);
 			//			canvas.drawBitmap(whiteRect, srcRect, dstRect, null);
 			if(i < codelist.size()){
@@ -463,11 +519,13 @@ implements SurfaceHolder.Callback, Runnable {
 	}
 
 	enum CodeForm{
-		sevens(R.drawable.sevens),
-		MajSevens(R.drawable.maj_sevens),
-		MinSevens(R.drawable.min_sevens),
-		MinMSevens(R.drawable.min_m_sevens),
-		diminish(R.drawable.diminish);
+		major_code(R.drawable.alpha),
+		minor_code(R.drawable.minor),
+		sevens_code(R.drawable.sevens),
+		major_sevens_code(R.drawable.maj_sevens),
+		minor_sevens_code(R.drawable.min_sevens),
+		minor_m_sevens_code(R.drawable.min_m_sevens),
+		diminish_code(R.drawable.diminish);
 		public final Bitmap image;
 		public Bitmap Image(){return image;};
 
