@@ -27,6 +27,7 @@ implements OnClickListener, OnCheckedChangeListener, OnSeekBarChangeListener{
 
 	private final int RQC_SETTINGS = 0;
 
+	private boolean reflesh_flag = false;
 	private SurfaceView sv; //標準のSV？
 	private CodeView codeView;
 	private SeekBar skb_tempo;
@@ -48,9 +49,6 @@ implements OnClickListener, OnCheckedChangeListener, OnSeekBarChangeListener{
 		//SurfaceView設定
 		sv = (SurfaceView)findViewById(R.id.sv_main);
 		codeView = new CodeView(this, sv);
-
-		//画像読み込み→enumのところで読み込むので不要
-
 
 		//コントロールUIの取得
 		skb_tempo = (SeekBar)findViewById(R.id.skb_tempo);
@@ -85,6 +83,10 @@ implements OnClickListener, OnCheckedChangeListener, OnSeekBarChangeListener{
 		codeView.loadPreference();
 		int tempo = codeView.loadTempoFromPreference(TEMPO_DEFA);
 		skb_tempo.setProgress(tempo - TEMPO_MIN);
+		if(reflesh_flag){
+			codeView.clearCode(false);
+			reflesh_flag = false;
+		}
 		super.onResume();
 	}
 
@@ -113,6 +115,7 @@ implements OnClickListener, OnCheckedChangeListener, OnSeekBarChangeListener{
 		super.onActivityResult(requestCode, resultCode, data);
 		if (RQC_SETTINGS == resultCode){
 			codeView.loadPreference();
+			reflesh_flag = true;
 		}
 	}
 	@Override

@@ -21,7 +21,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name="jp.agedash999.sample.codetraining.SettingsActivity" android:label="@string/action_settings"></activity>
+        <activity android:name="jp.agedash999.sample.codetraining.SettingsActivity" android:label="@string/action_settings" android:screenOrientation="landscape"></activity>
     </application>
 
 </manifest>

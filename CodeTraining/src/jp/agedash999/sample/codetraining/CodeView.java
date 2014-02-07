@@ -44,8 +44,9 @@ implements SurfaceHolder.Callback, Runnable {
 	//　テンポ ＝　一分間(60000mills)に四分音符を何回打つか
 	//　600000 / テンポ ＝ １拍の長さ
 	//private int tempo = 60000/96;
-	private int millsPerNote; //TODO 起動時テンポ設定読み込み
+	private int millsPerNote;
 	private int rhythm;
+	private final String RHYTHM_DEFAULT = "4";
 	private final String KEY_TEMPO = "key_tempo";
 
 
@@ -274,7 +275,7 @@ implements SurfaceHolder.Callback, Runnable {
 		}
 
 		//リズム設定
-		rhythm = Integer.parseInt(pref.getString(context.getString(R.string.key_rhythm), "4"));
+		rhythm = Integer.parseInt(pref.getString(context.getString(R.string.key_rhythm), RHYTHM_DEFAULT));
 
 		//コード種の設定取得・保存
 		codeFormScope.clear();
@@ -282,7 +283,7 @@ implements SurfaceHolder.Callback, Runnable {
 		int freq = 0;
 		int sum = 0;
 		for(int i = 0;i < forms.length;i++){
-			freq = Integer.parseInt(pref.getString(forms[i].name(), "0"));
+			freq = Integer.parseInt(pref.getString(forms[i].name(), forms[i].defaultFreq()));
 			codeFormScope.put(forms[i].name(),freq);
 			sum += freq;
 		}
@@ -519,19 +520,22 @@ implements SurfaceHolder.Callback, Runnable {
 	}
 
 	enum CodeForm{
-		major_code(R.drawable.alpha),
-		minor_code(R.drawable.minor),
-		sevens_code(R.drawable.sevens),
-		major_sevens_code(R.drawable.maj_sevens),
-		minor_sevens_code(R.drawable.min_sevens),
-		minor_m_sevens_code(R.drawable.min_m_sevens),
-		diminish_code(R.drawable.diminish);
+		major_code(R.drawable.alpha,"4"),
+		minor_code(R.drawable.minor,"4"),
+		sevens_code(R.drawable.sevens,"2"),
+		major_sevens_code(R.drawable.maj_sevens,"2"),
+		minor_sevens_code(R.drawable.min_sevens,"2"),
+		minor_m_sevens_code(R.drawable.min_m_sevens,"0"),
+		diminish_code(R.drawable.diminish,"0");
 		public final Bitmap image;
+		public final String defaultFreq;
 		public Bitmap Image(){return image;};
+		public String defaultFreq(){return defaultFreq;};
 
-		private CodeForm(int imageID){
+		private CodeForm(int imageID,String defaultFreq){
 			this.image = BitmapFactory.decodeResource
 					(CodeView.context.getResources(), imageID);
+			this.defaultFreq = defaultFreq;
 		}
 	}
 

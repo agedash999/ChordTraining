@@ -15,6 +15,7 @@ public class SettingsActivity extends Activity  {
 		super.onCreate(savedInstanceState);
 		//		getFragmentManager().beginTransaction()
 		//		.replace(android.R.id.content, new SettingsFragment()).commit();
+		
 		getFragmentManager().beginTransaction()
 		.replace(android.R.id.content, new SettingsFragment()).commit();
 	}

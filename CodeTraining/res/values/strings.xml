@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
+	<!-- App設定 -->
     <string name="app_name">CodeTraining</string>
     <string name="title_activity_main">CodeTraining</string>
     <string name="action_settings">Settings</string>
+	<!-- UI -->
     <string name="button_start">Start</string>
     <string name="button_stop">Stop</string>
     <string name="cbx_251">2/5/1進行</string>
     <string name="txv_title_tempo">Tempo</string>
+	<!-- 設定画面 -->
     <string name="key_pref_screen">pref_screen</string>
     <string name="pref_rhythm">Rhythm</string>
     <string name="key_rhythm">rhythm</string>
@@ -27,5 +29,6 @@
     <string name="key_diminish_code">diminish_code</string>
     <string name="pref_restore_default">Restore Default</string>
     <string name="key_restore_default">restore_default</string>
+	<!-- メッセージ -->
     <string name="msg_restore_default">すべての設定を初期値に戻しますか？</string>
 </resources>
