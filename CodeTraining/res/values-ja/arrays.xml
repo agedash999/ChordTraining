@@ -9,11 +9,11 @@
         <item >3</item>
     </string-array>
     <string-array name="entries_freq">
-        <item >High</item>
-        <item >A Little High</item>
-        <item >Middle</item>
-        <item >Low</item>
-        <item >Nothing</item>
+        <item >多め</item>
+        <item >やや多め</item>
+        <item >標準</item>
+        <item >少なめ</item>
+        <item >なし</item>
     </string-array>
     <string-array name="entryvalues_freq">
         <item >4</item>

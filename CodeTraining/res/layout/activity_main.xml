@@ -109,26 +109,15 @@
 
         </LinearLayout>
 
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="2dp"
-            android:background="@drawable/roundedrect_dgray"
-            android:gravity="center_vertical"
-            android:padding="5dp" >
+    </LinearLayout>
 
-            <CheckBox
-                android:id="@+id/cbx_251"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:text="@string/cbx_251"
-                android:textColor="@android:color/black"
-                android:background="@drawable/roundedrect_white"
-                />
-
-        </RelativeLayout>
-
+    <LinearLayout
+        android:id="@+id/layout_ad"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.30"
+        android:orientation="horizontal"
+        >
     </LinearLayout>
 
 </LinearLayout>

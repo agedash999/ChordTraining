@@ -9,12 +9,12 @@
     <string name="button_stop">Stop</string>
     <string name="txv_title_tempo">Tempo</string>
 	<!-- 設定画面 -->
-    <string name="title_pref_rhythm">Rhythm Setting</string>
-    <string name="title_pref_codetype">Code Type Frequency</string>
-    <string name="title_pref_tension">Tension Code Frequency</string>
-    <string name="title_pref_other">Other</string>
+    <string name="title_pref_rhythm">拍子設定</string>
+    <string name="title_pref_codetype">コードタイプ設定</string>
+    <string name="title_pref_tension">テンションコード設定</string>
+    <string name="title_pref_other">その他</string>
     <string name="key_pref_screen">pref_screen</string>
-    <string name="pref_rhythm">Rhythm</string>
+    <string name="pref_rhythm">拍子</string>
     <string name="key_rhythm">rhythm</string>
     <string name="pref_major_code">Major Code</string>
     <string name="key_major_code">major_code</string>
@@ -30,8 +30,8 @@
     <string name="key_minorm7th_code">minor_m_sevens_code</string>
     <string name="pref_diminish_code">Dim Code</string>
     <string name="key_diminish_code">diminish_code</string>
-    <string name="pref_restore_default">Restore Default</string>
+    <string name="pref_restore_default">設定初期化</string>
     <string name="key_restore_default">restore_default</string>
 	<!-- メッセージ -->
-    <string name="msg_restore_default">Restore default settings ?</string>
+    <string name="msg_restore_default">全設定を初期値に戻しますか？</string>
 </resources>

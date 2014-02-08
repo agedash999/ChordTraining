@@ -55,7 +55,6 @@ implements SurfaceHolder.Callback, Runnable {
 	private List<Code> codelist = new ArrayList<Code>();
 	private final int codeNumber = 4;
 
-	public boolean twofiveFlag = false;
 	private Map<String,Integer> codeFormScope = new HashMap<String, Integer>();
 	private final String KEY_CODE_FORM_SUM = "code_form_sum";
 
@@ -180,10 +179,10 @@ implements SurfaceHolder.Callback, Runnable {
 		lampDstY = lampSrcY + baseWidth * 5;
 
 		int baseHeight = canvasHeight/100;
-		height[0] = baseHeight * 60;
-		height[1] = baseHeight * 40;
-		height[2] = baseHeight * 40;
-		height[3] = baseHeight * 40;
+		height[0] = baseHeight * 75;
+		height[1] = baseHeight * 50;
+		height[2] = baseHeight * 50;
+		height[3] = baseHeight * 50;
 
 
 		srcX[0] = ( canvasHeight - height[0] ) / 2 ;
@@ -198,8 +197,8 @@ implements SurfaceHolder.Callback, Runnable {
 		dstX[3] = dstX[0];
 		srcX[3] = dstX[3] - height[3] ;
 
-		lampSrcX = srcX[0] - baseWidth * 5;
-		lampDstX = srcX[0];
+		lampSrcX = srcX[0];
+		lampDstX = srcX[0] + baseWidth * 5;
 
 		r = height[0] / 10;
 
@@ -297,42 +296,34 @@ implements SurfaceHolder.Callback, Runnable {
 		CodeRoot root = null;
 		CodeForm form = null;
 		CodeTension[] tensions = null;
-		if(prev == null || !twofiveFlag){
-			//TODO 後ほど 設定に従って生成するロジック
-			//Rootの生成
+		{
+			//CodeRootの決定
+			int random_int;
+			random_int = (int)(Math.random() * (EnumSet.allOf(CodeRoot.class).size()));
+			root = CodeRoot.values()[random_int];
 
-			{
-				//CodeRootの決定
-				int random_int;
-				random_int = (int)(Math.random() * (EnumSet.allOf(CodeRoot.class).size()));
-				root = CodeRoot.values()[random_int];
-
-			}
-
-			{
-				//CodeFormの決定
-				double random_double;
-				random_double = Math.random() * codeFormScope.get(KEY_CODE_FORM_SUM);
-				CodeForm[] forms = CodeForm.values();
-				int meter = 0;
-				int i = 0;
-				meter += codeFormScope.get(forms[i].name());
-				while(i< forms.length && meter < random_double){
-					i++;
-					meter += codeFormScope.get(forms[i].name());
-				}
-				form = forms[i];
-			}
-
-			//			n =  (int)rand;
-			//			n = (int)(Math.random() * (EnumSet.allOf(CodeForm.class).size()+1));
-			//			if(n!=0){
-			//				form = CodeForm.values()[n - 1];
-			//			}
-		}else{
-			//TODO 後ほど 25フラグに応じて生成するロジック
-			//TODO 後ほど 設定に従って生成するロジック
 		}
+
+		{
+			//CodeFormの決定
+			double random_double;
+			random_double = Math.random() * codeFormScope.get(KEY_CODE_FORM_SUM);
+			CodeForm[] forms = CodeForm.values();
+			int meter = 0;
+			int i = 0;
+			meter += codeFormScope.get(forms[i].name());
+			while(i< forms.length && meter < random_double){
+				i++;
+				meter += codeFormScope.get(forms[i].name());
+			}
+			form = forms[i];
+		}
+
+		//			n =  (int)rand;
+		//			n = (int)(Math.random() * (EnumSet.allOf(CodeForm.class).size()+1));
+		//			if(n!=0){
+		//				form = CodeForm.values()[n - 1];
+		//			}
 		return new Code(root,form,tensions);
 	}
 	private void doDraw(){

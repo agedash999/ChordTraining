@@ -3,15 +3,18 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:key="key_pref_screen"
      >
-    <ListPreference
-        android:title="@string/pref_rhythm"
-        android:key="@string/key_rhythm"
-        android:entries="@array/entries_rhythm"
-        android:entryValues="@array/entryvalues_rhythm"
-        android:defaultValue="4"
-        />
     <PreferenceCategory
-        android:title="Code Type">
+        android:title="@string/title_pref_rhythm">
+	    <ListPreference
+	        android:title="@string/pref_rhythm"
+	        android:key="@string/key_rhythm"
+	        android:entries="@array/entries_rhythm"
+	        android:entryValues="@array/entryvalues_rhythm"
+	        android:defaultValue="4"
+	        />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/title_pref_codetype">
         <ListPreference
             android:title="@string/pref_major_code"
             android:key="@string/key_major_code"
@@ -63,12 +66,12 @@
 	    />
     </PreferenceCategory>
     <PreferenceCategory
-        android:title="Tension">
+        android:title="@string/title_pref_tension">
 
 
     </PreferenceCategory>
     <PreferenceCategory
-        android:title="Other">
+        android:title="@string/title_pref_other">
         <jp.agedash999.sample.codetraining.RestoreDefaultDialog
             android:title="@string/pref_restore_default"
         	android:key="@string/key_restore_default"

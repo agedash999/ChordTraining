@@ -10,16 +10,18 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+
 public class MainActivity
 extends Activity
-implements OnClickListener, OnCheckedChangeListener, OnSeekBarChangeListener{
+implements OnClickListener, OnSeekBarChangeListener{
 
 	private final int TEMPO_MIN = 40;
 	private final int TEMPO_DEFA = 96;
@@ -32,6 +34,10 @@ implements OnClickListener, OnCheckedChangeListener, OnSeekBarChangeListener{
 	private CodeView codeView;
 	private SeekBar skb_tempo;
 	private TextView txv_tempo;
+
+	private AdView adView1;
+//	private AdView adView2;
+	private String MY_AD_UNIT_ID = "ca-app-pub-5585224991941747/7280763311";
 
 
 	//ログ関連
@@ -57,7 +63,6 @@ implements OnClickListener, OnCheckedChangeListener, OnSeekBarChangeListener{
 		//リスナー設定
 		((Button)findViewById(R.id.btn_start)).setOnClickListener(this);
 		((Button)findViewById(R.id.btn_stop)).setOnClickListener(this);
-		((CheckBox)findViewById(R.id.cbx_251)).setOnCheckedChangeListener(this);
 		skb_tempo.setOnSeekBarChangeListener(this);
 
 		skb_tempo.setMax(TEMPO_MAX - TEMPO_MIN);
@@ -65,6 +70,25 @@ implements OnClickListener, OnCheckedChangeListener, OnSeekBarChangeListener{
 		skb_tempo.setProgress(tempo - TEMPO_MIN);
 //		skb_tempo.setProgress(TEMPO_DEFA - TEMPO_MIN);
 //		edt_tempo.setText(Integer.toString(TEMPO_DEFA));
+
+	    // Create the adView.
+	    adView1 = new AdView(this);
+	    adView1.setAdUnitId(MY_AD_UNIT_ID);
+	    adView1.setAdSize(AdSize.BANNER);
+
+//	    adView2 = new AdView(this);
+//	    adView2.setAdUnitId(MY_AD_UNIT_ID);
+//	    adView2.setAdSize(AdSize.BANNER);
+
+	    LinearLayout layout = (LinearLayout)findViewById(R.id.layout_ad);
+	    layout.addView(adView1);
+//	    layout.addView(adView2);
+
+	    AdRequest adRequest1 = new AdRequest.Builder().build();
+//	    AdRequest adRequest2 = new AdRequest.Builder().build();
+
+	    adView1.loadAd(adRequest1);
+//	    adView2.loadAd(adRequest2);
 
 		changeUIforWaiting();
 	}
@@ -139,21 +163,6 @@ implements OnClickListener, OnCheckedChangeListener, OnSeekBarChangeListener{
 	}
 
 	@Override
-	public void onCheckedChanged(CompoundButton cb, boolean isChecked) {
-
-		switch (cb.getId()) {
-		case R.id.cbx_251:
-			//TODO 後ほど）チェックボックス変更時の処理
-			codeView.clearCode(true);
-
-			break;
-
-		default:
-			break;
-		}
-	}
-
-	@Override
 	public void onProgressChanged(SeekBar seekBar, int progress, boolean fromTouch) {
 		int tempo = progress + TEMPO_MIN;
 		codeView.changeTempo(tempo ,false);
@@ -181,14 +190,12 @@ implements OnClickListener, OnCheckedChangeListener, OnSeekBarChangeListener{
 		//TODO ボタン切替 ハンドリング方法問題ないか
 		((Button)findViewById(R.id.btn_start)).setEnabled(false);
 		((Button)findViewById(R.id.btn_stop)).setEnabled(true);
-		((CheckBox)findViewById(R.id.cbx_251)).setEnabled(false);
 	}
 
 	private void changeUIforWaiting(){
 		//TODO ボタン切替 ハンドリング方法問題ないか
 		((Button)findViewById(R.id.btn_start)).setEnabled(true);
 		((Button)findViewById(R.id.btn_stop)).setEnabled(false);
-		((CheckBox)findViewById(R.id.cbx_251)).setEnabled(true);
 	}
 
 	@Override
