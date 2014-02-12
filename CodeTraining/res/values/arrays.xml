@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="entries_rhythm">
+    <string-array name="entries_rhythm" translatable="false">
         <item >4/4</item>
         <item >3/4</item>
     </string-array>

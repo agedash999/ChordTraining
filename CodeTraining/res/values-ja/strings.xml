@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<!-- App設定 -->
-    <string name="app_name">CodeTraining</string>
-    <string name="title_activity_main">CodeTraining</string>
+    <string name="app_name">Code Training</string>
+    <string name="title_activity_main">Code Training</string>
     <string name="action_settings">Settings</string>
 	<!-- UI -->
     <string name="button_start">Start</string>

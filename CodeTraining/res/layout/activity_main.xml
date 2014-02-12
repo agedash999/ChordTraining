@@ -115,9 +115,9 @@
         android:id="@+id/layout_ad"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.30"
+        android:layout_weight="0.25"
         android:orientation="horizontal"
+        android:baselineAligned="false"
         >
     </LinearLayout>
-
 </LinearLayout>

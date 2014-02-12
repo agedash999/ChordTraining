@@ -3,6 +3,13 @@
     <issue id="ButtonStyle">
         <ignore path="res/layout/activity_main.xml" />
     </issue>
+    <issue id="ExtraTranslation">
+        <ignore path="res/values-ja/arrays.xml" />
+    </issue>
+    <issue id="MissingTranslation">
+        <ignore path="res/values/arrays.xml" />
+        <ignore path="res/values/strings.xml" />
+    </issue>
     <issue id="TypographyFractions">
         <ignore path="res/values/arrays.xml" />
     </issue>

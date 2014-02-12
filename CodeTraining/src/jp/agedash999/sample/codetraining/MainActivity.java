@@ -35,9 +35,11 @@ implements OnClickListener, OnSeekBarChangeListener{
 	private SeekBar skb_tempo;
 	private TextView txv_tempo;
 
-	private AdView adView1;
-//	private AdView adView2;
+	private AdView adView;
 	private String MY_AD_UNIT_ID = "ca-app-pub-5585224991941747/7280763311";
+
+//	private InterstitialAd interstitial;
+//	private String MY_INTERSTITIAL_UNIT_ID = "ca-app-pub-5585224991941747/7865859319";
 
 
 	//ログ関連
@@ -68,30 +70,36 @@ implements OnClickListener, OnSeekBarChangeListener{
 		skb_tempo.setMax(TEMPO_MAX - TEMPO_MIN);
 		int tempo = codeView.loadTempoFromPreference(TEMPO_DEFA);
 		skb_tempo.setProgress(tempo - TEMPO_MIN);
-//		skb_tempo.setProgress(TEMPO_DEFA - TEMPO_MIN);
-//		edt_tempo.setText(Integer.toString(TEMPO_DEFA));
+		//		skb_tempo.setProgress(TEMPO_DEFA - TEMPO_MIN);
+		//		edt_tempo.setText(Integer.toString(TEMPO_DEFA));
 
-	    // Create the adView.
-	    adView1 = new AdView(this);
-	    adView1.setAdUnitId(MY_AD_UNIT_ID);
-	    adView1.setAdSize(AdSize.BANNER);
+		// Create the adView.
+		adView = new AdView(this);
+		adView.setAdUnitId(MY_AD_UNIT_ID);
+		adView.setAdSize(AdSize.SMART_BANNER);
 
-//	    adView2 = new AdView(this);
-//	    adView2.setAdUnitId(MY_AD_UNIT_ID);
-//	    adView2.setAdSize(AdSize.BANNER);
+//		interstitial = new InterstitialAd(this);
+//		interstitial.setAdUnitId(MY_INTERSTITIAL_UNIT_ID);
 
-	    LinearLayout layout = (LinearLayout)findViewById(R.id.layout_ad);
-	    layout.addView(adView1);
-//	    layout.addView(adView2);
+		LinearLayout layout = (LinearLayout)findViewById(R.id.layout_ad);
+		layout.addView(adView);
 
-	    AdRequest adRequest1 = new AdRequest.Builder().build();
-//	    AdRequest adRequest2 = new AdRequest.Builder().build();
+		AdRequest adRequest = new AdRequest.Builder()
+//		.addTestDevice("532DAE97E1CCACF42C044E49F7273CD0")
+//		.addTestDevice("55951B05724E2E8E355BF61544777CC0")
+		.build();
 
-	    adView1.loadAd(adRequest1);
-//	    adView2.loadAd(adRequest2);
+		adView.loadAd(adRequest);
+//		interstitial.loadAd(adRequest);
 
 		changeUIforWaiting();
 	}
+
+//	public void displayInterstitial() {
+//		if (interstitial.isLoaded()) {
+//			interstitial.show();
+//		}
+//	}
 
 	@Override
 	protected void onPause() {
@@ -103,6 +111,7 @@ implements OnClickListener, OnSeekBarChangeListener{
 
 	@Override
 	protected void onResume() {
+//		displayInterstitial();
 		codeView.loadSoundPool(getApplicationContext());
 		codeView.loadPreference();
 		int tempo = codeView.loadTempoFromPreference(TEMPO_DEFA);
@@ -152,7 +161,6 @@ implements OnClickListener, OnSeekBarChangeListener{
 			break;
 
 		case R.id.btn_stop:
-			v.setEnabled(false);
 			changeUIforWaiting();
 			codeView.stopPlaying();
 			break;
@@ -169,22 +177,22 @@ implements OnClickListener, OnSeekBarChangeListener{
 		txv_tempo.setText(Integer.toString(tempo));
 	}
 
-//	public void onTextChanged(CharSequence s, int start, int before, int count) {
-//		String str = s.toString();
-//		int tempo = 56;
-//		try{
-//			tempo = Integer.parseInt(str);
-//		}catch(NumberFormatException e){
-//			//数値以外が入力された場合　基本ないはず
-//		}
-//		if(tempo<TEMPO_MIN){
-//			tempo = TEMPO_MIN;
-//		}else if(TEMPO_MAX < tempo){
-//			tempo = TEMPO_MAX;
-//		}
-//		codeView.changeTempo(tempo ,true);
-//		skb_tempo.setProgress(tempo-TEMPO_MIN);
-//	}
+	//	public void onTextChanged(CharSequence s, int start, int before, int count) {
+	//		String str = s.toString();
+	//		int tempo = 56;
+	//		try{
+	//			tempo = Integer.parseInt(str);
+	//		}catch(NumberFormatException e){
+	//			//数値以外が入力された場合　基本ないはず
+	//		}
+	//		if(tempo<TEMPO_MIN){
+	//			tempo = TEMPO_MIN;
+	//		}else if(TEMPO_MAX < tempo){
+	//			tempo = TEMPO_MAX;
+	//		}
+	//		codeView.changeTempo(tempo ,true);
+	//		skb_tempo.setProgress(tempo-TEMPO_MIN);
+	//	}
 
 	private void changeUIforPlaying(){
 		//TODO ボタン切替 ハンドリング方法問題ないか
