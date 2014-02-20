@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<!-- App設定 -->
-    <string name="app_name">Code Training</string>
-    <string name="title_activity_main">Code Training</string>
+    <string name="app_name">Chord Training</string>
+    <string name="title_activity_main">Chord Training</string>
     <string name="action_settings">Settings</string>
 	<!-- UI -->
     <string name="button_start">Start</string>
@@ -10,26 +10,26 @@
     <string name="txv_title_tempo">Tempo</string>
 	<!-- 設定画面 -->
     <string name="title_pref_rhythm">Rhythm Setting</string>
-    <string name="title_pref_codetype">Code Type Frequency</string>
-    <string name="title_pref_tension">Tension Code Frequency</string>
+    <string name="title_pref_chordtype">Chord Type Frequency</string>
+    <string name="title_pref_tension">Tension Chord Frequency</string>
     <string name="title_pref_other">Other</string>
     <string name="key_pref_screen">pref_screen</string>
     <string name="pref_rhythm">Rhythm</string>
     <string name="key_rhythm">rhythm</string>
-    <string name="pref_major_code">Major Code</string>
-    <string name="key_major_code">major_code</string>
-    <string name="pref_minor_code">Minor Code</string>
-    <string name="key_minor_code">minor_code</string>
-    <string name="pref_7th_code">7 Code</string>
-    <string name="key_7th_code">sevens_code</string>
-    <string name="pref_major7th_code">M7 Code</string>
-    <string name="key_major7th_code">major_sevens_code</string>
-    <string name="pref_minor7th_code">m7 Code</string>
-    <string name="key_minor7th_code">minor_sevens_code</string>
-    <string name="pref_minorm7th_code">Minor M7 Code</string>
-    <string name="key_minorm7th_code">minor_m_sevens_code</string>
-    <string name="pref_diminish_code">Dim Code</string>
-    <string name="key_diminish_code">diminish_code</string>
+    <string name="pref_major_chord">Major Chord</string>
+    <string name="key_major_chord">major_chord</string>
+    <string name="pref_minor_chord">Minor Chord</string>
+    <string name="key_minor_chord">minor_chord</string>
+    <string name="pref_7th_chord">7 Chord</string>
+    <string name="key_7th_chord">sevens_chord</string>
+    <string name="pref_major7th_chord">M7 Chord</string>
+    <string name="key_major7th_chord">major_sevens_chord</string>
+    <string name="pref_minor7th_chord">m7 Chord</string>
+    <string name="key_minor7th_chord">minor_sevens_chord</string>
+    <string name="pref_minorm7th_chord">Minor M7 Chord</string>
+    <string name="key_minorm7th_chord">minor_m_sevens_chord</string>
+    <string name="pref_diminish_chord">Dim Chord</string>
+    <string name="key_diminish_chord">diminish_chord</string>
     <string name="pref_restore_default">Restore Default</string>
     <string name="key_restore_default">restore_default</string>
 	<!-- メッセージ -->

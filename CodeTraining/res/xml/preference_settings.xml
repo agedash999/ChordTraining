@@ -14,52 +14,52 @@
 	        />
     </PreferenceCategory>
     <PreferenceCategory
-        android:title="@string/title_pref_codetype">
+        android:title="@string/title_pref_chordtype">
         <ListPreference
-            android:title="@string/pref_major_code"
-            android:key="@string/key_major_code"
+            android:title="@string/pref_major_chord"
+            android:key="@string/key_major_chord"
          	android:entries="@array/entries_freq"
 	        android:entryValues="@array/entryvalues_freq"
 	        android:defaultValue="4"
 	    />
         <ListPreference
-            android:title="@string/pref_minor_code"
-            android:key="@string/key_minor_code"
+            android:title="@string/pref_minor_chord"
+            android:key="@string/key_minor_chord"
          	android:entries="@array/entries_freq"
 	        android:entryValues="@array/entryvalues_freq"
 	        android:defaultValue="4"
 	    />
         <ListPreference
-            android:title="@string/pref_7th_code"
-            android:key="@string/key_7th_code"
+            android:title="@string/pref_7th_chord"
+            android:key="@string/key_7th_chord"
          	android:entries="@array/entries_freq"
 	        android:entryValues="@array/entryvalues_freq"
 	        android:defaultValue="2"
 	    />
         <ListPreference
-            android:title="@string/pref_major7th_code"
-            android:key="@string/key_major7th_code"
+            android:title="@string/pref_major7th_chord"
+            android:key="@string/key_major7th_chord"
          	android:entries="@array/entries_freq"
 	        android:entryValues="@array/entryvalues_freq"
 	        android:defaultValue="2"
 	    />
         <ListPreference
-            android:title="@string/pref_minor7th_code"
-            android:key="@string/key_minor7th_code"
+            android:title="@string/pref_minor7th_chord"
+            android:key="@string/key_minor7th_chord"
          	android:entries="@array/entries_freq"
 	        android:entryValues="@array/entryvalues_freq"
 	        android:defaultValue="2"
 	    />
         <ListPreference
-            android:title="@string/pref_minorm7th_code"
-            android:key="@string/key_minorm7th_code"
+            android:title="@string/pref_minorm7th_chord"
+            android:key="@string/key_minorm7th_chord"
          	android:entries="@array/entries_freq"
 	        android:entryValues="@array/entryvalues_freq"
 	        android:defaultValue="0"
 	    />
         <ListPreference
-            android:title="@string/pref_diminish_code"
-            android:key="@string/key_diminish_code"
+            android:title="@string/pref_diminish_chord"
+            android:key="@string/key_diminish_chord"
          	android:entries="@array/entries_freq"
 	        android:entryValues="@array/entryvalues_freq"
 	        android:defaultValue="0"
@@ -72,7 +72,7 @@
     </PreferenceCategory>
     <PreferenceCategory
         android:title="@string/title_pref_other">
-        <jp.agedash999.sample.codetraining.RestoreDefaultDialog
+        <jp.agedash999.sample.chordtraining.RestoreDefaultDialog
             android:title="@string/pref_restore_default"
         	android:key="@string/key_restore_default"
         	android:dialogMessage="@string/msg_restore_default"

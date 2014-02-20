@@ -1,4 +1,4 @@
-package jp.agedash999.sample.codetraining;
+package jp.agedash999.sample.chordtraining;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -31,7 +31,7 @@ implements OnClickListener, OnSeekBarChangeListener{
 
 	private boolean reflesh_flag = false;
 	private SurfaceView sv; //標準のSV？
-	private CodeView codeView;
+	private ChordView chordView;
 	private SeekBar skb_tempo;
 	private TextView txv_tempo;
 
@@ -43,7 +43,7 @@ implements OnClickListener, OnSeekBarChangeListener{
 
 
 	//ログ関連
-	private final String logTag = "CodeTraining.MainActivity";
+	private final String logTag = "ChordTraining.MainActivity";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +56,7 @@ implements OnClickListener, OnSeekBarChangeListener{
 
 		//SurfaceView設定
 		sv = (SurfaceView)findViewById(R.id.sv_main);
-		codeView = new CodeView(this, sv);
+		chordView = new ChordView(this, sv);
 
 		//コントロールUIの取得
 		skb_tempo = (SeekBar)findViewById(R.id.skb_tempo);
@@ -68,7 +68,7 @@ implements OnClickListener, OnSeekBarChangeListener{
 		skb_tempo.setOnSeekBarChangeListener(this);
 
 		skb_tempo.setMax(TEMPO_MAX - TEMPO_MIN);
-		int tempo = codeView.loadTempoFromPreference(TEMPO_DEFA);
+		int tempo = chordView.loadTempoFromPreference(TEMPO_DEFA);
 		skb_tempo.setProgress(tempo - TEMPO_MIN);
 		//		skb_tempo.setProgress(TEMPO_DEFA - TEMPO_MIN);
 		//		edt_tempo.setText(Integer.toString(TEMPO_DEFA));
@@ -104,20 +104,20 @@ implements OnClickListener, OnSeekBarChangeListener{
 	@Override
 	protected void onPause() {
 		changeUIforWaiting();
-		codeView.releaseSoundPool(getApplicationContext());
-		codeView.changeTempo(skb_tempo.getProgress() + TEMPO_MIN, true);
+		chordView.releaseSoundPool(getApplicationContext());
+		chordView.changeTempo(skb_tempo.getProgress() + TEMPO_MIN, true);
 		super.onPause();
 	}
 
 	@Override
 	protected void onResume() {
 //		displayInterstitial();
-		codeView.loadSoundPool(getApplicationContext());
-		codeView.loadPreference();
-		int tempo = codeView.loadTempoFromPreference(TEMPO_DEFA);
+		chordView.loadSoundPool(getApplicationContext());
+		chordView.loadPreference();
+		int tempo = chordView.loadTempoFromPreference(TEMPO_DEFA);
 		skb_tempo.setProgress(tempo - TEMPO_MIN);
 		if(reflesh_flag){
-			codeView.clearCode(false);
+			chordView.clearChord(false);
 			reflesh_flag = false;
 		}
 		super.onResume();
@@ -142,12 +142,12 @@ implements OnClickListener, OnSeekBarChangeListener{
 
 	@Override
 	protected void onActivityResult(
-			int requestCode,
-			int resultCode,
+			int requestChord,
+			int resultChord,
 			Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-		if (RQC_SETTINGS == resultCode){
-			codeView.loadPreference();
+		super.onActivityResult(requestChord, resultChord, data);
+		if (RQC_SETTINGS == resultChord){
+			chordView.loadPreference();
 			reflesh_flag = true;
 		}
 	}
@@ -157,12 +157,12 @@ implements OnClickListener, OnSeekBarChangeListener{
 		switch (v.getId()) {
 		case R.id.btn_start:
 			changeUIforPlaying();
-			codeView.startPlaying();
+			chordView.startPlaying();
 			break;
 
 		case R.id.btn_stop:
 			changeUIforWaiting();
-			codeView.stopPlaying();
+			chordView.stopPlaying();
 			break;
 
 		default:
@@ -173,7 +173,7 @@ implements OnClickListener, OnSeekBarChangeListener{
 	@Override
 	public void onProgressChanged(SeekBar seekBar, int progress, boolean fromTouch) {
 		int tempo = progress + TEMPO_MIN;
-		codeView.changeTempo(tempo ,false);
+		chordView.changeTempo(tempo ,false);
 		txv_tempo.setText(Integer.toString(tempo));
 	}
 
@@ -190,7 +190,7 @@ implements OnClickListener, OnSeekBarChangeListener{
 	//		}else if(TEMPO_MAX < tempo){
 	//			tempo = TEMPO_MAX;
 	//		}
-	//		codeView.changeTempo(tempo ,true);
+	//		chordView.changeTempo(tempo ,true);
 	//		skb_tempo.setProgress(tempo-TEMPO_MIN);
 	//	}
 

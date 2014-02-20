@@ -1,4 +1,4 @@
-package jp.agedash999.sample.codetraining;
+package jp.agedash999.sample.chordtraining;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -22,7 +22,7 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-public class CodeView
+public class ChordView
 implements SurfaceHolder.Callback, Runnable {
 
 	private SurfaceHolder holder;
@@ -51,12 +51,12 @@ implements SurfaceHolder.Callback, Runnable {
 
 
 	//コード関連
-	//	private Code[] codes;
-	private List<Code> codelist = new ArrayList<Code>();
-	private final int codeNumber = 4;
+	//	private Chord[] chords;
+	private List<Chord> chordlist = new ArrayList<Chord>();
+	private final int chordNumber = 4;
 
-	private Map<String,Integer> codeFormScope = new HashMap<String, Integer>();
-	private final String KEY_CODE_FORM_SUM = "code_form_sum";
+	private Map<String,Integer> chordFormScope = new HashMap<String, Integer>();
+	private final String KEY_CHORD_FORM_SUM = "chord_form_sum";
 
 	//ループ処理のステータス
 	private int status;
@@ -68,7 +68,7 @@ implements SurfaceHolder.Callback, Runnable {
 	private final int ERROR = 999;
 
 	//ログ関連
-	private final String logTag = "CodeTraining.CodeView";
+	private final String logTag = "ChordTraining.ChordView";
 
 	//	private Random rnd = new Random();
 
@@ -88,14 +88,14 @@ implements SurfaceHolder.Callback, Runnable {
 
 	private int bgColor = Color.rgb(201, 201, 196);
 
-	private Rect codeSrcRect;
+	private Rect chordSrcRect;
 	private Rect lampSrcRect;
-	private RectF codeDstRectF;
+	private RectF chordDstRectF;
 	private Rect lampDstRect;
 	private int r;
 
-	public CodeView(Context context, SurfaceView sv){
-		CodeView.context = context;
+	public ChordView(Context context, SurfaceView sv){
+		ChordView.context = context;
 
 		//SurfaceViewからholderを取得し、インターフェイスを設定する。
 		holder = sv.getHolder();
@@ -107,25 +107,25 @@ implements SurfaceHolder.Callback, Runnable {
 
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
-		//		whiteRect = BitmapFactory.decodeResource
-		//		(CodeView.context.getResources(), R.drawable.white);
+		//		whiteRect = BitmapFactory.dechordResource
+		//		(ChordView.context.getResources(), R.drawable.white);
 		lampR =  BitmapFactory.decodeResource
-				(CodeView.context.getResources(), R.drawable.lamp_r);
+				(ChordView.context.getResources(), R.drawable.lamp_r);
 		lampB =  BitmapFactory.decodeResource
-				(CodeView.context.getResources(), R.drawable.lamp_b);
+				(ChordView.context.getResources(), R.drawable.lamp_b);
 
-		codeSrcRect = new Rect();
+		chordSrcRect = new Rect();
 		lampSrcRect = new Rect();
-		codeDstRectF = new RectF();
+		chordDstRectF = new RectF();
 		lampDstRect = new Rect();
 
 		//画面表示配列の初期化
-		width = new int[codeNumber];
-		height = new int[codeNumber];
-		srcX = new int[codeNumber];
-		srcY = new int[codeNumber];
-		dstX = new int[codeNumber];
-		dstY = new int[codeNumber];
+		width = new int[chordNumber];
+		height = new int[chordNumber];
+		srcX = new int[chordNumber];
+		srcY = new int[chordNumber];
+		dstX = new int[chordNumber];
+		dstY = new int[chordNumber];
 
 		// TODO 画面生成後の初期処理
 		Canvas canvas = holder.lockCanvas();
@@ -133,8 +133,8 @@ implements SurfaceHolder.Callback, Runnable {
 		setScreenParm(canvas);
 		holder.unlockCanvasAndPost(canvas);
 
-		Bitmap code1 = CodeRoot.values()[0].Image();
-		codeSrcRect.set(0,0,code1.getWidth(),code1.getHeight());
+		Bitmap chord1 = ChordRoot.values()[0].Image();
+		chordSrcRect.set(0,0,chord1.getWidth(),chord1.getHeight());
 		lampSrcRect.set(0,0,lampR.getWidth(),lampR.getHeight());
 		lampDstRect.set(lampSrcY,lampSrcX,lampDstY,lampDstX);
 		whitePaint.setColor(Color.WHITE);
@@ -240,11 +240,11 @@ implements SurfaceHolder.Callback, Runnable {
 		Log.d(logTag, "Status Chenged: PREPARE_STOP");
 	}
 
-	public void clearCode(boolean refleshFlag){
-		codelist.clear();
+	public void clearChord(boolean refleshFlag){
+		chordlist.clear();
 		if(refleshFlag){
 			doDraw();
-			Log.d(logTag, "clearCode");
+			Log.d(logTag, "clearChord");
 
 		}
 	}
@@ -277,54 +277,54 @@ implements SurfaceHolder.Callback, Runnable {
 		rhythm = Integer.parseInt(pref.getString(context.getString(R.string.key_rhythm), RHYTHM_DEFAULT));
 
 		//コード種の設定取得・保存
-		codeFormScope.clear();
-		CodeForm[] forms = CodeForm.values();
+		chordFormScope.clear();
+		ChordForm[] forms = ChordForm.values();
 		int freq = 0;
 		int sum = 0;
 		for(int i = 0;i < forms.length;i++){
 			freq = Integer.parseInt(pref.getString(forms[i].name(), forms[i].defaultFreq()));
-			codeFormScope.put(forms[i].name(),freq);
+			chordFormScope.put(forms[i].name(),freq);
 			sum += freq;
 		}
-		codeFormScope.put(KEY_CODE_FORM_SUM, sum);
+		chordFormScope.put(KEY_CHORD_FORM_SUM, sum);
 
 		//TODO テンション設定取得・保存
 	}
 
-	private Code createOneCode(Code prev){
+	private Chord createOneChord(Chord prev){
 		//コードを生成する
-		CodeRoot root = null;
-		CodeForm form = null;
-		CodeTension[] tensions = null;
+		ChordRoot root = null;
+		ChordForm form = null;
+		ChordTension[] tensions = null;
 		{
-			//CodeRootの決定
+			//ChordRootの決定
 			int random_int;
-			random_int = (int)(Math.random() * (EnumSet.allOf(CodeRoot.class).size()));
-			root = CodeRoot.values()[random_int];
+			random_int = (int)(Math.random() * (EnumSet.allOf(ChordRoot.class).size()));
+			root = ChordRoot.values()[random_int];
 
 		}
 
 		{
-			//CodeFormの決定
+			//ChordFormの決定
 			double random_double;
-			random_double = Math.random() * codeFormScope.get(KEY_CODE_FORM_SUM);
-			CodeForm[] forms = CodeForm.values();
+			random_double = Math.random() * chordFormScope.get(KEY_CHORD_FORM_SUM);
+			ChordForm[] forms = ChordForm.values();
 			int meter = 0;
 			int i = 0;
-			meter += codeFormScope.get(forms[i].name());
+			meter += chordFormScope.get(forms[i].name());
 			while(i< forms.length && meter < random_double){
 				i++;
-				meter += codeFormScope.get(forms[i].name());
+				meter += chordFormScope.get(forms[i].name());
 			}
 			form = forms[i];
 		}
 
 		//			n =  (int)rand;
-		//			n = (int)(Math.random() * (EnumSet.allOf(CodeForm.class).size()+1));
+		//			n = (int)(Math.random() * (EnumSet.allOf(ChordForm.class).size()+1));
 		//			if(n!=0){
-		//				form = CodeForm.values()[n - 1];
+		//				form = ChordForm.values()[n - 1];
 		//			}
-		return new Code(root,form,tensions);
+		return new Chord(root,form,tensions);
 	}
 	private void doDraw(){
 		doDraw(lampR,0);
@@ -336,21 +336,21 @@ implements SurfaceHolder.Callback, Runnable {
 		canvas.drawColor(bgColor);
 
 		//コードの描画
-		for(int i = 0; i < codeNumber ; i++){
-			codeDstRectF.set(srcY[i],srcX[i],dstY[i],dstX[i]);
-			//			canvas.drawRect(codeDstRect, whitePaint);
-			canvas.drawRoundRect(codeDstRectF, r, r, whitePaint);
+		for(int i = 0; i < chordNumber ; i++){
+			chordDstRectF.set(srcY[i],srcX[i],dstY[i],dstX[i]);
+			//			canvas.drawRect(chordDstRect, whitePaint);
+			canvas.drawRoundRect(chordDstRectF, r, r, whitePaint);
 			//			canvas.drawBitmap(whiteRect, srcRect, dstRect, null);
-			if(i < codelist.size()){
-				Code code = codelist.get(i);
-				canvas.drawBitmap(code.root.Image(), codeSrcRect, codeDstRectF, null);
-				if(code.form!=null){
-					canvas.drawBitmap(code.form.Image(), codeSrcRect, codeDstRectF, null);
+			if(i < chordlist.size()){
+				Chord chord = chordlist.get(i);
+				canvas.drawBitmap(chord.root.Image(), chordSrcRect, chordDstRectF, null);
+				if(chord.form!=null){
+					canvas.drawBitmap(chord.form.Image(), chordSrcRect, chordDstRectF, null);
 				}
-				if(code.tensions!=null && code.tensions.length!=0){
-					canvas.drawBitmap(parenthesis, codeSrcRect, codeDstRectF, null);
-					for(CodeTension tension : code.tensions){
-						canvas.drawBitmap(tension.Image(), codeSrcRect, codeDstRectF, null);
+				if(chord.tensions!=null && chord.tensions.length!=0){
+					canvas.drawBitmap(parenthesis, chordSrcRect, chordDstRectF, null);
+					for(ChordTension tension : chord.tensions){
+						canvas.drawBitmap(tension.Image(), chordSrcRect, chordDstRectF, null);
 					}
 				}
 			}
@@ -371,11 +371,11 @@ implements SurfaceHolder.Callback, Runnable {
 
 			}else if(status==PREPARE_START){
 				//コード初期生成
-				for(int i = codelist.size();i<codeNumber;i++){
+				for(int i = chordlist.size();i<chordNumber;i++){
 					if(i<=0){
-						codelist.add(i, createOneCode(null));
+						chordlist.add(i, createOneChord(null));
 					}else{
-						codelist.add(i, createOneCode(codelist.get(i-1)));
+						chordlist.add(i, createOneChord(chordlist.get(i-1)));
 					}
 				}
 				//コード表示
@@ -449,9 +449,9 @@ implements SurfaceHolder.Callback, Runnable {
 				}else{
 					//次のコード
 					//コード移動・追加生成
-					codelist.remove(0);
-					codelist.add(codeNumber-1,
-							createOneCode(codelist.get(codeNumber-2)));
+					chordlist.remove(0);
+					chordlist.add(chordNumber-1,
+							createOneChord(chordlist.get(chordNumber-2)));
 					baseTime += millsPerNote;
 					count = 1;
 					lamp = lampR;
@@ -488,7 +488,7 @@ implements SurfaceHolder.Callback, Runnable {
 	(SurfaceHolder arg0, int arg1, int arg2, int arg3) {
 	}
 
-	enum CodeRoot{
+	enum ChordRoot{
 		C(R.drawable.c),
 		F(R.drawable.f),
 		Bf(R.drawable.bf),
@@ -504,56 +504,56 @@ implements SurfaceHolder.Callback, Runnable {
 		public final Bitmap image;
 		public Bitmap Image(){return image;};
 
-		private CodeRoot(int imageID){
+		private ChordRoot(int imageID){
 			this.image = BitmapFactory.decodeResource
-					(CodeView.context.getResources(), imageID);
+					(ChordView.context.getResources(), imageID);
 		}
 	}
 
-	enum CodeForm{
-		major_code(R.drawable.alpha,"4"),
-		minor_code(R.drawable.minor,"4"),
-		sevens_code(R.drawable.sevens,"2"),
-		major_sevens_code(R.drawable.maj_sevens,"2"),
-		minor_sevens_code(R.drawable.min_sevens,"2"),
-		minor_m_sevens_code(R.drawable.min_m_sevens,"0"),
-		diminish_code(R.drawable.diminish,"0");
+	enum ChordForm{
+		major_chord(R.drawable.alpha,"4"),
+		minor_chord(R.drawable.minor,"4"),
+		sevens_chord(R.drawable.sevens,"2"),
+		major_sevens_chord(R.drawable.maj_sevens,"2"),
+		minor_sevens_chord(R.drawable.min_sevens,"2"),
+		minor_m_sevens_chord(R.drawable.min_m_sevens,"0"),
+		diminish_chord(R.drawable.diminish,"0");
 		public final Bitmap image;
 		public final String defaultFreq;
 		public Bitmap Image(){return image;};
 		public String defaultFreq(){return defaultFreq;};
 
-		private CodeForm(int imageID,String defaultFreq){
+		private ChordForm(int imageID,String defaultFreq){
 			this.image = BitmapFactory.decodeResource
-					(CodeView.context.getResources(), imageID);
+					(ChordView.context.getResources(), imageID);
 			this.defaultFreq = defaultFreq;
 		}
 	}
 
-	enum CodeTension{
+	enum ChordTension{
 		//TODO テンションは未実装。
 		;
 		public final Bitmap image;
 		public Bitmap Image(){return image;};
 
-		private CodeTension(int imageID){
+		private ChordTension(int imageID){
 			this.image = BitmapFactory.decodeResource
-					(CodeView.context.getResources(), imageID);
+					(ChordView.context.getResources(), imageID);
 		}
 
 	}
 
-	class Code{
-		public CodeRoot root;
-		public CodeForm form;
-		public CodeTension[] tensions;
+	class Chord{
+		public ChordRoot root;
+		public ChordForm form;
+		public ChordTension[] tensions;
 
-		public Code(CodeRoot root,CodeForm form, CodeTension[] tensions){
+		public Chord(ChordRoot root,ChordForm form, ChordTension[] tensions){
 			this.root = root;
 			this.form = form;
 			int i = 0;
 			if(tensions!=null){
-				for(CodeTension tension : tensions){
+				for(ChordTension tension : tensions){
 					tensions[i] = tension;
 					i++;
 				}
