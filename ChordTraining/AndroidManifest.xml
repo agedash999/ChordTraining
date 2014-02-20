@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="jp.agedash999.sample.chordtraining"
-    android:versionCode="1"
+<manifest package="jp.agedash999.sample.codetraining"
+    android:versionCode="2"
     android:versionName="2.0" xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-sdk
@@ -20,7 +20,7 @@
             android:value="@integer/google_play_services_version"
             />
         <activity
-            android:name="jp.agedash999.sample.chordtraining.MainActivity"
+            android:name="jp.agedash999.sample.codetraining.MainActivity"
             android:label="@string/title_activity_main" android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -28,7 +28,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="jp.agedash999.sample.chordtraining.SettingsActivity"
+            android:name="jp.agedash999.sample.codetraining.SettingsActivity"
             android:label="@string/action_settings"
             android:screenOrientation="landscape"></activity>
         <activity

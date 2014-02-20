@@ -1,4 +1,4 @@
-package jp.agedash999.sample.chordtraining;
+package jp.agedash999.sample.codetraining;
 
 import android.app.Activity;
 import android.content.SharedPreferences;

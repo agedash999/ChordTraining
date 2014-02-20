@@ -72,7 +72,7 @@
     </PreferenceCategory>
     <PreferenceCategory
         android:title="@string/title_pref_other">
-        <jp.agedash999.sample.chordtraining.RestoreDefaultDialog
+        <jp.agedash999.sample.codetraining.RestoreDefaultDialog
             android:title="@string/pref_restore_default"
         	android:key="@string/key_restore_default"
         	android:dialogMessage="@string/msg_restore_default"

@@ -1,4 +1,4 @@
-package jp.agedash999.sample.chordtraining;
+package jp.agedash999.sample.codetraining;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
